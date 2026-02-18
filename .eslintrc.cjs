@@ -23,6 +23,17 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'import/prefer-default-export': 'off',
     'import/extensions': 'off',
+    'import/no-extraneous-dependencies': [
+    'error',
+    {
+      devDependencies: [
+        '**/*.mock.ts',       
+        'src/mocks/**',       
+        'vite.config.ts', 
+        'src/main.tsx'        
+      ],
+    },
+  ],
   },
   ignorePatterns: ['dist', '.eslintrc.cjs', 'vite.config.ts'],
 };
