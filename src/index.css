@@ -1,1 +1,184 @@
 @import 'tailwindcss';
+
+@theme {
+  /* ===== Colors ===== */
+
+  /* Black */
+  --color-black-0: #fefefe;
+  --color-black-50: #e5e5e5;
+  --color-black-100: #d0d0d0;
+  --color-black-200: #a0a0a0;
+  --color-black-300: #6b6b6b;
+  --color-black-400: #363636;
+  --color-black-500: #000000;
+
+  /* Blue */
+  --color-blue-50: #e0e1eb;
+  --color-blue-100: #b4b9e7;
+  --color-blue-200: #707ce0;
+  --color-blue-300: #0018ec;
+
+  /* Yellow */
+  --color-yellow-50: #e9e6d4;
+  --color-yellow-100: #ebe5c2;
+  --color-yellow-200: #ebdd99;
+  --color-yellow-300: #eedb77;
+  --color-yellow-400: #f1d858;
+  --color-yellow-500: #f1d029;
+
+  /* ===== Typography ===== */
+
+  /* 속성 (caption) — 10/12 */
+  --font-size-caption: 10px;
+  --line-height-caption: 12px;
+
+  /* 안내문구 (label) — 12/12 */
+  --font-size-label: 12px;
+  --line-height-label: 12px;
+
+  /* 설명 (desc) — 14/14 */
+  --font-size-desc: 14px;
+  --line-height-desc: 14px;
+
+  /* 텍스트 (body) — 16/16 */
+  --font-size-body: 16px;
+  --line-height-body: 16px;
+
+  /* h3 — 20/20 */
+  --font-size-h3: 20px;
+  --line-height-h3: 20px;
+
+  /* h2 — 24/24 */
+  --font-size-h2: 24px;
+  --line-height-h2: 24px;
+
+  /* h1 — 28/28 */
+  --font-size-h1: 28px;
+  --line-height-h1: 28px;
+}
+
+@layer utilities {
+  /* h1 */
+  .h1-semibold {
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: 600;
+  }
+  .h1-medium {
+    font-size: var(--font-size-h1);
+    line-height: normal;
+    font-weight: 500;
+  }
+  .h1-bold {
+    font-size: var(--font-size-h1);
+    line-height: var(--line-height-h1);
+    font-weight: 700;
+  }
+
+  /* h2 */
+  .h2-semibold {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: 600;
+  }
+  .h2-medium {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: 500;
+  }
+  .h2-bold {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+    font-weight: 700;
+  }
+
+  /* h3 */
+  .h3-semibold {
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: 600;
+  }
+  .h3-medium {
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: 500;
+  }
+  .h3-bold {
+    font-size: var(--font-size-h3);
+    line-height: var(--line-height-h3);
+    font-weight: 700;
+  }
+
+  /* 텍스트 (body) */
+  .body-regular {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: 400;
+  }
+  .body-medium {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: 500;
+  }
+  .body-semibold {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: 600;
+  }
+  .body-bold {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+    font-weight: 700;
+  }
+
+  /* 설명 (description) */
+  .description-regular {
+    font-size: var(--font-size-desc);
+    line-height: var(--line-height-desc);
+    font-weight: 400;
+  }
+  .description-medium {
+    font-size: var(--font-size-desc);
+    line-height: var(--line-height-desc);
+    font-weight: 500;
+  }
+  .description-semibold {
+    font-size: var(--font-size-desc);
+    line-height: var(--line-height-desc);
+    font-weight: 600;
+  }
+
+  /* 안내문구 (label) */
+  .label-regular {
+    font-size: var(--font-size-label);
+    line-height: var(--line-height-label);
+    font-weight: 400;
+  }
+  .label-medium {
+    font-size: var(--font-size-label);
+    line-height: var(--line-height-label);
+    font-weight: 500;
+  }
+  .label-semibold {
+    font-size: var(--font-size-label);
+    line-height: var(--line-height-label);
+    font-weight: 600;
+  }
+
+  /* 속성 (caption) */
+  .caption-regular {
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: 400;
+  }
+  .caption-medium {
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: 500;
+  }
+  .caption-semibold {
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    font-weight: 600;
+  }
+}
