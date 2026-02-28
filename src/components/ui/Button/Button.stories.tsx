@@ -59,7 +59,7 @@ export const Sizes: Story = {
 
 export const Disabled: Story = {
   args: {
-    children: '비활성화 버튼',
+    children: 'disabled',
     size: 'md',
     disabled: true,
   },
