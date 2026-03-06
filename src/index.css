@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@source "./**/*.{tsx,ts,jsx,js}";
 
 @theme {
   /* ===== Colors ===== */
