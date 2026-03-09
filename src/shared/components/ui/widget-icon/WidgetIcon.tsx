@@ -6,7 +6,7 @@ import Icon from '@/shared/components/ui/icon/Icon';
 type IconName = 'info' | 'note' | 'file' | 'quiz' | 'vote' | 'question';
 
 const iconWidgetVariants = cva(
-  'inline-flex items-center justify-center w-[30px] h-[30px] shrink-0 rounded-lg transition-colors',
+  'inline-flex items-center justify-center shrink-0 rounded-lg transition-colors hover:brightness-95',
   {
     variants: {
       iconName: {
@@ -26,19 +26,24 @@ const iconWidgetVariants = cva(
 
 interface WidgetIconProps
   extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    React.HTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconWidgetVariants> {
   iconName: IconName;
   size?: number;
 }
 
-function WidgetIcon({ iconName, className, size = 14 }: WidgetIconProps) {
+function WidgetIcon({ iconName, className, size = 30 }: WidgetIconProps) {
+  const iconSize = size * (14 / 30);
+
   return (
-    <div className={cn(iconWidgetVariants({ iconName }), className)}>
+    <div
+      className={cn(iconWidgetVariants({ iconName }), className)}
+      style={{ width: `${size}px`, height: `${size}px` }}
+    >
       <Icon
         name={iconName}
-        size={size}
-        className="w-auto h-auto max-w-[14px] max-h-[14px] object-contain"
+        className="object-contain"
+        style={{ width: `${iconSize}px`, height: `${iconSize}px` }}
       />
     </div>
   );
