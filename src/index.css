@@ -56,6 +56,14 @@
   /* h1 — 28/28 */
   --font-size-h1: 28px;
   --line-height-h1: 28px;
+
+  /* WidgetIcon 배경 색상 */
+  --color-widget-info: #dbeafe;
+  --color-widget-note: #d1fae5;
+  --color-widget-file: #fef3c7;
+  --color-widget-question: #dbeafe;
+  --color-widget-vote: #e1dbfc;
+  --color-widget-quiz: #ffe4e6;
 }
 
 @layer utilities {
