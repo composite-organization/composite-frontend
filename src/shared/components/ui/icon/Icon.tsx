@@ -9,7 +9,12 @@ type IconName =
   | 'link'
   | 'more'
   | 'pin'
-  | 'upload';
+  | 'upload'
+  | 'file'
+  | 'note'
+  | 'quiz'
+  | 'vote'
+  | 'question';
 
 interface IconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   name: IconName;
