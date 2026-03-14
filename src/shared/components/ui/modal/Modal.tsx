@@ -11,7 +11,7 @@ interface ModalProps {
 function Modal({ title, isOpen, onClose, children }: ModalProps) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-100 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black-500/35">
       <div
         role="dialog"
         aria-modal="true"
