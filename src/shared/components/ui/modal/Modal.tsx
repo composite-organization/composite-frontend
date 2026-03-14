@@ -24,7 +24,7 @@ function Modal({ title, isOpen, onClose, children }: ModalProps) {
           </h1>
           <IconButton iconName="close" shape="circle" onClick={onClose} />
         </div>
-        {children}
+        <div className="flex flex-col w-full gap-6">{children}</div>
       </div>
     </div>
   );
