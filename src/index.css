@@ -68,33 +68,33 @@
   /* ===== Widget Card Colors ===== */
 
   /* Question (Blue 계열) */
-  --color-widget-question-bg: #eff6ff80; /* 50% */
+  --color-widget-question-bg: #eff6ff50; /* 50% */
   --color-widget-question-bg-sel: #eff6ff; /* 100% */
   --color-widget-question-border: #9fc8ff; /* 100% */
   --color-widget-question-border-sel: #2563eb; /* 100% */
 
   /* Note (Green 계열) */
-  --color-widget-note-bg: #ecfdf580; /* 50% */
+  --color-widget-note-bg: #ecfdf550; /* 50% */
   --color-widget-note-bg-sel: #ecfdf5; /* 100% */
-  --color-widget-note-border: #05966980; /* 50% */
+  --color-widget-note-border: #05966950; /* 50% */
   --color-widget-note-border-sel: #059669; /* 100% */
 
   /* File (Yellow/Amber 계열) */
-  --color-widget-file-bg: #fffbeb80; /* 50% */
+  --color-widget-file-bg: #fffbeb50; /* 50% */
   --color-widget-file-bg-sel: #fffbeb; /* 100% */
-  --color-widget-file-border: #d9770680; /* 50% */
+  --color-widget-file-border: #d9770650; /* 50% */
   --color-widget-file-border-sel: #d97706; /* 100% */
 
   /* Quiz (Red/Pink 계열) */
-  --color-widget-quiz-bg: #fff1f280; /* 50% */
+  --color-widget-quiz-bg: #fff1f250; /* 50% */
   --color-widget-quiz-bg-sel: #fff1f2; /* 100% */
-  --color-widget-quiz-border: #e11d4880; /* 50% */
+  --color-widget-quiz-border: #e11d4850; /* 50% */
   --color-widget-quiz-border-sel: #e11d48; /* 100% */
 
   /* Vote (Purple 계열) */
-  --color-widget-vote-bg: #f5f3ff80; /* 50% */
+  --color-widget-vote-bg: #f5f3ff50; /* 50% */
   --color-widget-vote-bg-sel: #f5f3ff; /* 100% */
-  --color-widget-vote-border: #7c3aed80; /* 50% */
+  --color-widget-vote-border: #7c3aed50; /* 50% */
   --color-widget-vote-border-sel: #7c3aed; /* 100% */
 }
 
