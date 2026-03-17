@@ -14,7 +14,10 @@ type IconName =
   | 'note'
   | 'quiz'
   | 'vote'
-  | 'question';
+  | 'question'
+  | 'module'
+  | 'PC'
+  | 'chat';
 
 interface IconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   name: IconName;
