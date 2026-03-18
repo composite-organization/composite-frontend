@@ -19,7 +19,7 @@ function Option({ options, onToggle }: OptionProps) {
         {options.map((option) => (
           <div
             key={option.id}
-            className="flex flex-row justify-between items-center w-full h-[18px]"
+            className="flex flex-row justify-between items-center w-full h-4.5"
           >
             <span className="body-medium text-black-500">{option.label}</span>
             <ToggleButton

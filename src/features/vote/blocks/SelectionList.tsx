@@ -54,8 +54,16 @@ function StudentList({
             />
             <div className="relative flex-1">
               <div
+                role="button"
+                tabIndex={0}
+                onClick={() => onSelect(selection.id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    onSelect(selection.id);
+                  }
+                }}
                 className={cn(
-                  'flex flex-row items-center px-5 py-4 h-12 rounded-xl border-2 overflow-hidden',
+                  'flex flex-row items-center px-5 py-4 h-12 rounded-xl border-2 overflow-hidden cursor-pointer',
                   isSelected ? 'border-blue-300' : 'border-black-200',
                 )}
                 style={

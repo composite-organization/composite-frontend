@@ -36,9 +36,9 @@ function Modal({ title, isOpen, onClose, children }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        className="flex h-auto w-[500px] flex-col items-center rounded-[28px] bg-black-0 p-8"
+        className="flex h-auto w-125 flex-col items-center rounded-[28px] bg-black-0 p-8"
       >
-        <div className="flex items-center justify-between w-full h-[52px]">
+        <div className="flex items-center justify-between w-full h-13">
           <h1 id="modal-title" className="h2-semibold">
             {title}
           </h1>
