@@ -34,7 +34,7 @@ function EntranceForm({
         <IconButton
           shape="square"
           iconName="add"
-          className="h-14 w-[75px] bg-blue-300"
+          className="h-12 w-[75px] bg-blue-300"
           onClick={onAction}
         />
       </div>
