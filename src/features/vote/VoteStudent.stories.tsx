@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import VoteStudent from './VoteStudent';
+import { VoteStudent } from './ui';
 
 const SAMPLE_SELECTIONS_BASIC = [
   { id: '1', label: '찬성' },
