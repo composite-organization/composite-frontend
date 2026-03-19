@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { VoteCreate } from './ui';
+import { VoteCreate } from '..';
 
 const meta: Meta<typeof VoteCreate> = {
   title: 'Feature/VoteCreate',
