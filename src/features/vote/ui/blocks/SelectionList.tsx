@@ -68,7 +68,7 @@ function StudentList({
                     : {}
                 }
               >
-                <span className="flex-1 body-medium text-black-500">
+                <span className="flex-1 text-left body-medium text-black-500">
                   {selection.label}
                 </span>
                 {selection.voteCount !== undefined && (
@@ -109,7 +109,7 @@ function TeacherList({ selections }: TeacherSelectionListProps) {
                   : {}
               }
             >
-              <span className="flex-1 body-medium text-black-500">
+              <span className="flex-1 text-left body-medium text-black-500">
                 {selection.label}
               </span>
               {selection.voteCount !== undefined && (
