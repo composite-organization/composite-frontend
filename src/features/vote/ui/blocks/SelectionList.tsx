@@ -38,11 +38,11 @@ function StudentList({
   onSelect,
 }: StudentSelectionListProps) {
   return (
-    <div className="flex flex-col gap-2.5 w-full">
+    <ul className="flex flex-col gap-2.5 w-full">
       {selections.map((selection, index) => {
         const isSelected = selectedIds.includes(selection.id);
         return (
-          <div
+          <li
             key={selection.id}
             className="flex flex-row items-center gap-2 w-full"
           >
@@ -53,17 +53,11 @@ function StudentList({
               ariaLabel={`선택지 ${index + 1}: ${selection.label}`}
             />
             <div className="relative flex-1">
-              <div
-                role="button"
-                tabIndex={0}
+              <button
+                type="button"
                 onClick={() => onSelect(selection.id)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    onSelect(selection.id);
-                  }
-                }}
                 className={cn(
-                  'flex flex-row items-center px-5 py-4 h-12 rounded-xl border-2 overflow-hidden cursor-pointer',
+                  'flex flex-row items-center px-5 py-4 h-12 w-full rounded-xl border-2 overflow-hidden cursor-pointer',
                   isSelected ? 'border-blue-300' : 'border-black-200',
                 )}
                 style={
@@ -82,20 +76,20 @@ function StudentList({
                     {selection.voteCount}명
                   </span>
                 )}
-              </div>
+              </button>
             </div>
-          </div>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }
 
 function TeacherList({ selections }: TeacherSelectionListProps) {
   return (
-    <div className="flex flex-col gap-2.5 w-full">
+    <ul className="flex flex-col gap-2.5 w-full">
       {selections.map((selection, index) => (
-        <div
+        <li
           key={selection.id}
           className="flex flex-row items-center gap-2 w-full"
         >
@@ -125,9 +119,9 @@ function TeacherList({ selections }: TeacherSelectionListProps) {
               )}
             </div>
           </div>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -137,9 +131,9 @@ function EditableList({
   onRemove,
 }: EditableSelectionListProps) {
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <ul className="flex flex-col gap-3 w-full">
       {selections.map((selection, index) => (
-        <div
+        <li
           key={selection.id}
           className="flex flex-row items-center gap-1 w-full"
         >
@@ -185,9 +179,9 @@ function EditableList({
               />
             </svg>
           </button>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 

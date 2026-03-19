@@ -76,19 +76,23 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
           onChange={(event) => setTitle(event.target.value)}
           placeholder="예: 홍길동"
         />
-        <div className="flex flex-col gap-2 w-full">
+        <label
+          htmlFor="vote-description"
+          className="flex flex-col gap-2 w-full"
+        >
           <span className="h3-semibold text-black-500">부가 설명</span>
           <div className="box-border flex flex-row items-center px-5 py-4 w-full h-20 border-2 border-black-200 rounded-xl">
             <textarea
+              id="vote-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               placeholder="예: 홍길동"
               className="flex-1 resize-none bg-transparent outline-none body-regular text-black-500 placeholder:text-black-200 h-full"
             />
           </div>
-        </div>
-        <div className="flex flex-col items-center gap-3 w-full">
-          <span className="h3-semibold text-black-500 w-full">선택지</span>
+        </label>
+        <fieldset className="flex flex-col items-center gap-3 w-full border-none p-0 m-0">
+          <legend className="h3-semibold text-black-500 w-full">선택지</legend>
           <SelectionList
             variant="editable"
             selections={selections}
@@ -96,7 +100,7 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
             onRemove={handleRemoveSelection}
           />
           <SelectionAddButton onClick={handleAddSelection} className="w-full" />
-        </div>
+        </fieldset>
         <Option options={voteOptions} onToggle={handleToggleOption} />
       </div>
       <div className="flex flex-row items-center gap-9 w-full">
