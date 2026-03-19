@@ -19,7 +19,7 @@ const numberButtonVariants = cva(
 );
 
 const choiceBoxVariants = cva(
-  'flex flex-1 items-center rounded-xl border-2 px-5 py-4 body-medium text-black-500 transition-colors',
+  'flex flex-1 items-center rounded-xl border-2 px-5 py-4 body-medium text-black-500 transition-colors text-left',
   {
     variants: {
       state: {
@@ -39,35 +39,14 @@ interface QuizSelectionProps extends VariantProps<typeof numberButtonVariants> {
   index: number;
   content: string;
   state: 'default' | 'selected' | 'correct' | 'disabled';
-  onClick?: () => void;
 }
 
-function QuizSelection({ index, content, state, onClick }: QuizSelectionProps) {
-  const isInteractive = state !== 'disabled';
-
+function QuizSelection({ index, content, state }: QuizSelectionProps) {
   return (
-    <button
-      type="button"
-      disabled={!isInteractive}
-      onClick={onClick}
-      className={cn(
-        'flex w-full flex-row items-center gap-2 bg-transparent cursor-pointer disabled:cursor-not-allowed',
-      )}
-    >
-      <div
-        className={cn(numberButtonVariants({ state }), 'pointer-events-none')}
-      >
-        {index}
-      </div>
-      <div
-        className={cn(
-          choiceBoxVariants({ state }),
-          'pointer-events-none text-left',
-        )}
-      >
-        {content}
-      </div>
-    </button>
+    <div className="flex w-full flex-row items-center gap-2 pointer-events-none">
+      <div className={cn(numberButtonVariants({ state }))}>{index}</div>
+      <div className={cn(choiceBoxVariants({ state }))}>{content}</div>
+    </div>
   );
 }
 
