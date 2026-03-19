@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-bind */
 import { useState } from 'react';
 import Modal from '@/shared/components/ui/modal/Modal';
 import Input from '@/shared/components/ui/input/Input';
@@ -118,7 +117,7 @@ function QuizCreate({ isOpen, onClose, onSubmit }: QuizCreateProps) {
 
   return (
     <Modal title="퀴즈" isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col gap-[22px] w-full">
+      <div className="flex flex-col gap-5.5 w-full mt-4">
         <Input
           title="질문"
           placeholder="질문을 입력하세요"
@@ -157,11 +156,16 @@ function QuizCreate({ isOpen, onClose, onSubmit }: QuizCreateProps) {
         </div>
       </div>
 
-      <div className="flex flex-row items-center gap-[43px]">
-        <Button variant="cancel" size="xl" onClick={onClose}>
+      <div className="flex flex-row items-center gap-4 w-full">
+        <Button variant="cancel" size="lg" className="flex-1" onClick={onClose}>
           취소
         </Button>
-        <Button variant="blue" size="xl" onClick={handleSubmit}>
+        <Button
+          variant="blue"
+          size="lg"
+          className="flex-1"
+          onClick={handleSubmit}
+        >
           생성
         </Button>
       </div>
