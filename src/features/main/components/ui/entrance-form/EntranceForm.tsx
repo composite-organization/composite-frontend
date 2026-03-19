@@ -3,6 +3,7 @@ import Input from '@/shared/components/ui/input/Input';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 
 interface EntranceFormProps {
+  id: string;
   description: string;
   title: string;
   placeholder: string;
@@ -12,6 +13,7 @@ interface EntranceFormProps {
 }
 
 function EntranceForm({
+  id,
   description,
   title,
   placeholder,
@@ -19,12 +21,19 @@ function EntranceForm({
   onChange,
   onAction,
 }: EntranceFormProps) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onAction?.();
+  };
   return (
-    <div className="flex flex-col gap-[10px] w-full">
+    <form className="flex flex-col gap-[10px] w-full" onSubmit={handleSubmit}>
       <div className="body-regular text-black-300">{description}</div>
-      <div className="h3-semibold text-black-500">{title}</div>
+      <label htmlFor={id} className="h3-semibold text-black-500">
+        {title}
+      </label>
       <div className="flex w-full gap-3">
         <Input
+          id={id}
           state="default"
           placeholder={placeholder}
           value={value}
@@ -32,13 +41,13 @@ function EntranceForm({
           wrapperClassName="h-12 py-0"
         />
         <IconButton
+          type="submit"
           shape="square"
           iconName="add"
           className="h-12 w-[75px] bg-blue-300"
-          onClick={onAction}
         />
       </div>
-    </div>
+    </form>
   );
 }
 export default EntranceForm;

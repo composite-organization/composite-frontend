@@ -12,6 +12,7 @@ function EntranceSection() {
     <div className="flex flex-col pt-5">
       <div className="flex flex-col gap-7">
         <EntranceForm
+          id="join-code"
           description="수업 코드를 공유받았다면?"
           title="수업에 참여하기"
           placeholder="수업 코드 입력하기"
@@ -20,6 +21,7 @@ function EntranceSection() {
           onAction={handleJoin}
         />
         <EntranceForm
+          id="find-code"
           description="이미 수업을 만들었다면?"
           title="내 수업 찾기"
           placeholder="수업 코드 입력하기"
