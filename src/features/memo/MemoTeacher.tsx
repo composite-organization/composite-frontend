@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import MemoItem from '@/features/memo/blocks/MemoItem';
@@ -7,17 +7,17 @@ interface MemoTeacherProps {
   widgetName?: string;
   widgetDescription?: string;
   initialTitle?: string;
-  initialContent?: string;
+  initialMemo?: string;
 }
 
 function MemoTeacher({
   widgetName = '메모장',
   widgetDescription = '위젯 설명',
   initialTitle = '',
-  initialContent = '',
+  initialMemo = '',
 }: MemoTeacherProps) {
   const [title, setTitle] = useState(initialTitle);
-  const [content, setContent] = useState(initialContent);
+  const [memo, setMemo] = useState(initialMemo);
 
   return (
     <div className="flex flex-col w-[520px]">
@@ -36,10 +36,10 @@ function MemoTeacher({
       <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2 bg-black-0 border-x border-b border-black-200 rounded-b-[20px] w-[520px]">
         <MemoItem
           title={title}
-          content={content}
+          memo={memo}
           isEditable
           onTitleChange={setTitle}
-          onContentChange={setContent}
+          onMemoChange={setMemo}
         />
       </div>
     </div>

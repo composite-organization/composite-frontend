@@ -2,21 +2,21 @@ import Input from '@/shared/components/ui/input/Input';
 
 interface MemoItemProps {
   title: string;
-  content: string;
+  memo: string;
   isEditable?: boolean;
   onTitleChange?: (value: string) => void;
-  onContentChange?: (value: string) => void;
+  onMemoChange?: (value: string) => void;
 }
 
 function MemoItem({
   title,
-  content,
+  memo,
   isEditable = false,
   onTitleChange,
-  onContentChange,
+  onMemoChange,
 }: MemoItemProps) {
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-4 w-full">
       {isEditable ? (
         <Input
           variant="bare"
@@ -31,16 +31,14 @@ function MemoItem({
       {isEditable ? (
         <Input
           multiline
-          value={content}
-          onChange={(event) => onContentChange?.(event.target.value)}
-          placeholder="내용을 입력하세요"
+          value={memo}
+          onChange={(event) => onMemoChange?.(event.target.value)}
+          placeholder="메모를 입력하세요"
           rows={5}
         />
       ) : (
-        <div className="flex flex-row items-center px-5 py-4 rounded-xl w-full h-28 border-2 border-black-200">
-          <p className="body-regular text-black-500 w-full overflow-auto">
-            {content}
-          </p>
+        <div className="flex flex-row items-start px-5 py-4 rounded-xl w-full min-h-28 border-2 border-black-200">
+          <p className="body-regular text-black-500 w-full">{memo}</p>
         </div>
       )}
     </div>
