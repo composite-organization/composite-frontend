@@ -39,7 +39,6 @@ interface AddWidgetModalProps {
 function AddWidgetModal({ isOpen, onClose }: AddWidgetModalProps) {
   const handleClickWidget = (widgetName: WidgetName) => {
     console.log(`${widgetName} 위젯이 클릭되었습니다.`);
-    // 여기서 위젯 추가 로직을 실행하거나 onClose()를 호출할 수 있습니다.
   };
 
   return (
