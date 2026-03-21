@@ -48,8 +48,8 @@ function AddWidgetCard({
     >
       <WidgetIcon iconName={widgetName} size={45} />
       <div className="flex flex-col gap-[10px] p-0 text-left">
-        <h1 className="body-semibold text-black-500 ">{title}</h1>
-        <h2 className="description-medium text-black-300">{label}</h2>
+        <strong className="body-semibold text-black-500 ">{title}</strong>
+        <p className="description-medium text-black-300">{label}</p>
       </div>
     </button>
   );

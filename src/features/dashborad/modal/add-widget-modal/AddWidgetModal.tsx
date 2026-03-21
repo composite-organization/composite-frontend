@@ -44,17 +44,18 @@ function AddWidgetModal({ isOpen, onClose }: AddWidgetModalProps) {
 
   return (
     <Modal title="위젯 추가" isOpen={isOpen} onClose={onClose}>
-      <div className="flex flex-col gap-[10px]">
+      <ul className="flex flex-col gap-[10px]">
         {WIDGET_CARD_INFO.map((widget) => (
-          <AddWidgetCard
-            key={widget.id}
-            widgetName={widget.id}
-            title={widget.title}
-            label={widget.label}
-            onClick={() => handleClickWidget(widget.id)}
-          />
+          <li key={widget.id}>
+            <AddWidgetCard
+              widgetName={widget.id}
+              title={widget.title}
+              label={widget.label}
+              onClick={() => handleClickWidget(widget.id)}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     </Modal>
   );
 }
