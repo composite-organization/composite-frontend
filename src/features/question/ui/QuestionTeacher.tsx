@@ -60,18 +60,24 @@ function QuestionTeacher({
     questions?.slice(startIndex, startIndex + itemsPerPage) ?? [];
 
   return (
-    <div className="flex flex-col w-130">
+    <section
+      className="flex flex-col w-130"
+      aria-labelledby="teacher-question-title"
+    >
       <div className="flex flex-row justify-between items-center px-4 py-3 h-[60px] bg-white border border-black-200 rounded-t-[20px]">
         <div className="flex flex-row items-center gap-3">
           <WidgetIcon iconName="question" size={36} />
           <div className="flex flex-col gap-1">
-            <span className="body-medium text-black-500">{widgetName}</span>
-            <span className="label-regular text-black-200">
-              {widgetDescription}
-            </span>
+            <p
+              id="teacher-question-title"
+              className="body-medium text-black-500"
+            >
+              {widgetName}
+            </p>
+            <p className="label-regular text-black-200">{widgetDescription}</p>
           </div>
         </div>
-        <IconButton iconName="more" shape="square" />
+        <IconButton iconName="more" shape="square" aria-label="메뉴 열기" />
       </div>
       <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2 bg-black-0 border-x border-b border-black-200 rounded-b-[20px] w-[520px]">
         {questions.length === 0 ? (
@@ -79,7 +85,7 @@ function QuestionTeacher({
             등록된 질문이 없습니다
           </p>
         ) : (
-          <>
+          <div className="w-full flex flex-col gap-2" aria-label="질문 목록">
             {currentQuestions.map((question) => (
               <QuestionCard
                 key={question.id}
@@ -101,10 +107,10 @@ function QuestionTeacher({
                 onPageChange={setCurrentPage}
               />
             </div>
-          </>
+          </div>
         )}
       </div>
-    </div>
+    </section>
   );
 }
 

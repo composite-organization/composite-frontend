@@ -36,16 +36,20 @@ function Pagination({
   };
 
   return (
-    <div className="flex items-center justify-center gap-[12px] w-fit h-[48px] mx-auto">
+    <nav
+      className="flex items-center justify-center gap-[12px] w-fit h-[48px] mx-auto"
+      aria-label="페이지 선택"
+    >
       <button
         type="button"
         disabled={!hasPrevGroup}
         onClick={handlePrev}
         className="flex items-center justify-center w-8 h-8 disabled:cursor-not-allowed transition-all"
+        aria-label="이전 페이지 그룹"
       >
         <img
           src={`${assetPath}/${!hasPrevGroup ? 'prev-lite' : 'prev-fill'}.svg`}
-          alt="이전 그룹"
+          alt="이전"
         />
       </button>
 
@@ -62,6 +66,8 @@ function Pagination({
                 ? 'bg-black-400 text-white'
                 : 'bg-transparent text-black-300 hover:bg-black-50',
             )}
+            aria-current={currentPage === page ? 'page' : undefined}
+            aria-label={`${page} 페이지`}
           >
             {page}
           </button>
@@ -73,13 +79,14 @@ function Pagination({
         disabled={!hasNextGroup}
         onClick={handleNext}
         className="flex items-center justify-center w-8 h-8 disabled:cursor-not-allowed transition-all"
+        aria-label="다음 페이지 그룹"
       >
         <img
           src={`${assetPath}/${!hasNextGroup ? 'next-lite' : 'next-fill'}.svg`}
-          alt="다음 그룹"
+          alt="다음"
         />
       </button>
-    </div>
+    </nav>
   );
 }
 

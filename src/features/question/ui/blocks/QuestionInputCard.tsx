@@ -21,12 +21,16 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
   };
 
   return (
-    <div className="flex flex-col w-122 px-3 py-3 rounded-2xl border-1 border-black-50 gap-3">
+    <section
+      className="flex flex-col w-122 px-3 py-3 rounded-2xl border-1 border-black-50 gap-3"
+      aria-label="질문 작성"
+    >
       <TextareaAutosize
         className="w-full resize-none border-none outline-none description-medium placeholder:text-black-300"
         placeholder="질문을 입력하세요..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        aria-label="질문 내용 입력"
       />
       <div className="flex items-center justify-between p-0">
         <button
@@ -36,6 +40,7 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
             'flex items-center justify-between h-4 px-1.5 py-0.5 gap-1 rounded-md bg-black-100 caption-semibold text-black-300',
             isAnonymous ? 'bg-black-500 text-black-0' : '',
           )}
+          aria-label={isAnonymous ? '실명으로 전환' : '익명으로 전환'}
         >
           <img
             src={`src/features/question/asset/${isAnonymous ? 'person-cross' : 'person-check'}.svg`}
@@ -51,6 +56,8 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
             'flex items-center h-5 px-[6px] py-1 gap-1 rounded-xl bg-black-100 caption-semibold text-black-0',
             content.length > 5 ? 'bg-blue-300' : '',
           )}
+          disabled={content.length <= 5}
+          aria-label="질문 등록"
         >
           <img
             src="src/features/question/asset/send.svg"
@@ -60,7 +67,7 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
           등록
         </button>
       </div>
-    </div>
+    </section>
   );
 }
 

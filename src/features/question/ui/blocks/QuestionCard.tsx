@@ -75,7 +75,7 @@ function QuestionCard({
   };
 
   return (
-    <div
+    <section
       className={cn(
         questionCardVariants({ state: isCompleted ? 'complete' : 'default' }),
         'group relative transition-all',
@@ -84,10 +84,13 @@ function QuestionCard({
     >
       <div className="flex justify-between px-[14px] pt-[14px] pb-0 items-top h-6.5">
         <div className="flex p-0 m-0 gap-[10px]">
-          <div className="label-regular">{userName}</div>
-          <span className="caption-regular">
+          <span className="label-regular">{userName}</span>
+          <time
+            dateTime={createAt.toISOString()}
+            className="caption-regular text-black-300"
+          >
             {format(createAt, 'yyyy-MM-dd HH:mm')} 작성됨
-          </span>
+          </time>
           {isCompleted && (
             <div className="flex px-[5px] gap-0.5 h-3 bg-widget-note-bg-sel text-widget-note-border-sel caption-regular rounded-xl">
               <img
@@ -108,6 +111,7 @@ function QuestionCard({
               // const menus = getMenuItems();
               // console.log(`${userRole}용 메뉴:`, menus);
             }}
+            aria-label="옵션 더보기"
           >
             <img
               src="src/features/question/asset/more.svg"
@@ -118,23 +122,26 @@ function QuestionCard({
         )}
       </div>
       <div className="flex flex-col items-start px-[14px] py-[10px] gap-[10px]">
-        <div className="description-medium">{content}</div>
-        <button
-          className={cn(
-            likeButtonVariants({ state: isLike ? 'like' : 'default' }),
-          )}
-          type="button"
-          onClick={handleClickLike}
-          disabled={isCompleted}
-        >
-          <img
-            src={`src/features/question/asset/${isLike ? 'thumbs-up-fill' : 'thumbs-up'}.svg`}
-            alt="like"
-          />
-          {likeCount}
-        </button>
+        <p className="description-medium text-black-500">{content}</p>
+        <div className="w-full">
+          <button
+            className={cn(
+              likeButtonVariants({ state: isLike ? 'like' : 'default' }),
+            )}
+            type="button"
+            onClick={handleClickLike}
+            disabled={isCompleted}
+            aria-label={`좋아요 ${likeCount}개`}
+          >
+            <img
+              src={`src/features/question/asset/${isLike ? 'thumbs-up-fill' : 'thumbs-up'}.svg`}
+              alt="like"
+            />
+            {likeCount}
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 export default QuestionCard;
