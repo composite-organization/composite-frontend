@@ -12,7 +12,7 @@ function DashboardHeader({
   onOpenModal,
 }: DashBoardHeaderProps) {
   return (
-    <header className="flex justify-between w-full min-w-[1600px] px-30 pt-8 pb-4">
+    <header className="flex justify-between w-full min-w-[900px] px-30 pt-8 pb-4">
       <div className="flex items-end gap-4">
         <h2 className="h2-semibold text-black-500">{lessonName}</h2>
         <p className="body-medium text-black-500">{teacherName}</p>
