@@ -14,7 +14,7 @@ function LectureMaterialsStudent({
   onDownload,
 }: LectureMaterialsStudentProps) {
   return (
-    <div className="relative w-130">
+    <article className="relative w-130">
       <div className="flex flex-row items-center justify-between px-4 py-3 bg-white border border-black-200 rounded-t-[20px]">
         <div className="flex flex-row items-center gap-3">
           <WidgetIcon iconName="file" size={36} />
@@ -35,18 +35,16 @@ function LectureMaterialsStudent({
             </span>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 w-full">
+          <ul className="flex flex-col gap-2 w-full">
             {materials.map((material) => (
-              <MaterialBlock
-                key={material.id}
-                material={material}
-                onDownload={onDownload}
-              />
+              <li key={material.id}>
+                <MaterialBlock material={material} onDownload={onDownload} />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
-    </div>
+    </article>
   );
 }
 

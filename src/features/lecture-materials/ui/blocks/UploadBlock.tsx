@@ -10,10 +10,6 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       onUpload(event.target.files);
@@ -23,7 +19,7 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
     }
   };
 
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setIsDraggingOver(true);
   };
@@ -32,7 +28,7 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
     setIsDraggingOver(false);
   };
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setIsDraggingOver(false);
     if (event.dataTransfer.files && event.dataTransfer.files.length > 0) {
@@ -41,13 +37,8 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
   };
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') handleClick();
-      }}
+    <label
+      htmlFor="file-upload-input"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -77,12 +68,13 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
 
       <input
         ref={fileInputRef}
+        id="file-upload-input"
         type="file"
         multiple
         className="hidden"
         onChange={handleFileChange}
       />
-    </div>
+    </label>
   );
 }
 
