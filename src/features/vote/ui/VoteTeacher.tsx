@@ -21,8 +21,8 @@ function VoteTeacher({
   onStopClick,
 }: VoteTeacherProps) {
   return (
-    <div className="relative w-130">
-      <div className="absolute top-0 left-0 w-full h-15 box-border flex flex-row justify-between items-center px-4 py-3 bg-white border border-black-200 rounded-[20px_20px_0_0]">
+    <div className="flex flex-col w-130">
+      <div className="box-border flex flex-row items-center px-4 py-3 h-15 bg-white border border-black-200 rounded-[20px_20px_0_0]">
         <div className="flex flex-row items-center gap-3">
           <WidgetIcon iconName="vote" size={36} />
           <div className="flex flex-col gap-1">
@@ -31,7 +31,7 @@ function VoteTeacher({
           </div>
         </div>
       </div>
-      <div className="absolute top-15 left-0 w-full box-border flex flex-col gap-5 px-4 pt-4 pb-5 bg-black-0 border-[0_1px_1px_1px] border-black-200 rounded-[0_0_20px_20px]">
+      <div className="box-border flex flex-col gap-5 px-4 pt-4 pb-5 bg-black-0 border-[0_1px_1px_1px] border-black-200 rounded-[0_0_20px_20px]">
         <div className="flex flex-row items-center gap-2.5 w-full">
           <p className="flex-1 body-regular text-black-500">{description}</p>
           <OptionBadge options={options} />
