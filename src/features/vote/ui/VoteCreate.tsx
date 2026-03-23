@@ -37,35 +37,35 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
   ]);
   const [voteOptions, setVoteOptions] = useState<VoteOption[]>(DEFAULT_OPTIONS);
 
-  function handleAddSelection() {
+  const handleAddSelection = () => {
     setSelections((previous) => [...previous, createEmptySelection()]);
-  }
+  };
 
-  function handleChangeLabel(id: string, label: string) {
+  const handleChangeLabel = (id: string, label: string) => {
     setSelections((previous) =>
       previous.map((selection) =>
         selection.id === id ? { ...selection, label } : selection,
       ),
     );
-  }
+  };
 
-  function handleRemoveSelection(id: string) {
+  const handleRemoveSelection = (id: string) => {
     setSelections((previous) =>
       previous.filter((selection) => selection.id !== id),
     );
-  }
+  };
 
-  function handleToggleOption(id: string, enabled: boolean) {
+  const handleToggleOption = (id: string, enabled: boolean) => {
     setVoteOptions((previous) =>
       previous.map((option) =>
         option.id === id ? { ...option, enabled } : option,
       ),
     );
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     onSubmit({ title, description, selections, options: voteOptions });
-  }
+  };
 
   return (
     <Modal title="투표" isOpen={isOpen} onClose={onCancel}>

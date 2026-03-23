@@ -25,7 +25,7 @@ function VoteStudent({
 }: VoteStudentProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  function handleSelect(id: string) {
+  const handleSelect = (id: string) => {
     if (isMultipleChoice) {
       setSelectedIds((previous) =>
         previous.includes(id)
@@ -35,11 +35,11 @@ function VoteStudent({
     } else {
       setSelectedIds((previous) => (previous.includes(id) ? [] : [id]));
     }
-  }
+  };
 
-  function handleSubmit() {
+  const handleSubmit = () => {
     onSubmit(selectedIds);
-  }
+  };
 
   return (
     <div className="relative w-130">
