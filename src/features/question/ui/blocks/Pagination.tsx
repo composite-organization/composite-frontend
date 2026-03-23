@@ -37,7 +37,7 @@ function Pagination({
 
   return (
     <nav
-      className="flex items-center justify-center gap-[12px] w-fit h-[48px] mx-auto"
+      className="flex items-center justify-center gap-3 w-fit h-12 mx-auto"
       aria-label="페이지 선택"
     >
       <button
@@ -53,17 +53,17 @@ function Pagination({
         />
       </button>
 
-      <div className="flex items-center gap-[12px]">
+      <div className="flex items-center gap-3">
         {pages.map((page) => (
           <button
             key={page}
             type="button"
             onClick={() => onPageChange(page)}
             className={cn(
-              'flex items-center justify-center w-7 h-8 rounded-[8px] transition-all',
-              'text-[16px] font-semibold leading-none',
+              'flex items-center justify-center w-7 h-8 rounded-lg transition-all',
+              'body-semibold leading-none',
               currentPage === page
-                ? 'bg-black-400 text-white'
+                ? 'bg-black-400 text-black-0'
                 : 'bg-transparent text-black-300 hover:bg-black-50',
             )}
             aria-current={currentPage === page ? 'page' : undefined}
