@@ -42,17 +42,11 @@ function UploadBlock({ hasFiles, onUpload }: UploadBlockProps) {
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className="flex flex-row items-center justify-center gap-3 px-2.5 py-3 rounded-xl cursor-pointer w-full h-17.5 transition-colors"
-      style={
-        hasFiles
-          ? {
-              backgroundColor: isDraggingOver ? '#fff3b0' : '#FFFADE',
-              border: '2px solid #FFCC89',
-            }
-          : {
-              backgroundColor: isDraggingOver ? '#d0d0d0' : '#E5E5E5',
-            }
-      }
+      className="flex flex-row items-center justify-center gap-3 px-2.5 py-3 rounded-xl cursor-pointer w-full h-17.5 transition-colors border-2"
+      style={{
+        backgroundColor: isDraggingOver ? '#FFFADE' : '#E5E5E5',
+        borderColor: isDraggingOver ? '#FFCC89' : 'transparent',
+      }}
     >
       <Icon
         name="upload"
