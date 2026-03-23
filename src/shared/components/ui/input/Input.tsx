@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
@@ -80,8 +80,11 @@ function Input({
   value,
   onChange,
   placeholder,
+  id: idProp,
   ...props
 }: InputProps) {
+  const generatedId = useId();
+  const inputId = idProp ?? (title ? generatedId : undefined);
   const isDisabled = state === 'disabled';
 
   const innerClassName = cn(inputInnerVariants({ variant, state }), className);
@@ -96,6 +99,7 @@ function Input({
     >
       {multiline ? (
         <textarea
+          id={inputId}
           value={value as string | undefined}
           onChange={
             onChange as
@@ -109,6 +113,7 @@ function Input({
         />
       ) : (
         <input
+          id={inputId}
           type="text"
           value={value}
           onChange={onChange}
@@ -133,7 +138,9 @@ function Input({
   if (title) {
     return (
       <div className="flex w-full flex-col gap-2">
-        <span className="h3-semibold text-black-500">{title}</span>
+        <label htmlFor={inputId} className="h3-semibold text-black-500">
+          {title}
+        </label>
         {inputElement}
       </div>
     );

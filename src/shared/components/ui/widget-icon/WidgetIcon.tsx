@@ -26,7 +26,7 @@ const iconWidgetVariants = cva(
 
 interface WidgetIconProps
   extends
-    React.HTMLAttributes<HTMLButtonElement>,
+    React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof iconWidgetVariants> {
   iconName: IconName;
   size?: number;
@@ -44,6 +44,7 @@ function WidgetIcon({ iconName, className, size = 30 }: WidgetIconProps) {
         name={iconName}
         className="object-contain"
         style={{ width: `${iconSize}px`, height: `${iconSize}px` }}
+        decorative
       />
     </div>
   );
