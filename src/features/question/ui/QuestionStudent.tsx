@@ -1,79 +1,34 @@
-import { useState } from 'react';
 import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import QuestionInputCard from './blocks/QuestionInputCard';
 import QuestionCard from './blocks/QuestionCard';
 import Pagination from './blocks/Pagination';
-
-interface Question {
-  id: string;
-  userName: string;
-  createAt: Date;
-  content: string;
-  likeCount: number;
-  isCompleted: boolean;
-  isLiked: boolean;
-  userId: string;
-}
+import { getPaginatedData } from '../util/pagination';
+import type { Question } from '../types';
 
 interface QuestionStudentProps {
   widgetName?: string;
   widgetDescription?: string;
   currentUserId?: string;
+  questions: Question[];
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  onSubmitQuestion: (content: string, isAnonymous: boolean) => void;
 }
-
-// const MOCK_QUESTIONS: Question[] = [
-//   {
-//     id: '1',
-//     userName: '홍길동',
-//     createAt: new Date('2026-03-21T14:30:00'),
-//     content: '교수님, 중간고사 범위는 어디까지인가요?',
-//     likeCount: 3,
-//     isCompleted: false,
-//     isLiked: false,
-//     userId: 'user123',
-//   },
-//   {
-//     id: '2',
-//     userName: '김철수',
-//     createAt: new Date('2026-03-22T09:00:00'),
-//     content: '지난 수업 때 말씀하신 참고도서 제목이 기억이 안 나요.',
-//     likeCount: 1,
-//     isCompleted: true,
-//     isLiked: true,
-//     userId: 'user456',
-//   },
-// ];
 
 function QuestionStudent({
   widgetName = '질문',
   widgetDescription = '자유롭게 질문을 남겨주세요.',
   currentUserId = 'me',
+  questions,
+  currentPage,
+  onPageChange,
+  onSubmitQuestion,
 }: QuestionStudentProps) {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
-  const totalPages = Math.ceil((questions?.length ?? 0) / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentQuestions =
-    questions?.slice(startIndex, startIndex + itemsPerPage) ?? [];
-
-  const handleSubmitQuestion = (content: string, isAnonymous: boolean) => {
-    const newQuestion: Question = {
-      id: Math.random().toString(36).substring(2, 9),
-      userName: isAnonymous ? '익명' : '홍길동',
-      createAt: new Date(),
-      content,
-      likeCount: 0,
-      isCompleted: false,
-      isLiked: false,
-      userId: currentUserId,
-    };
-
-    setQuestions((prev) => [newQuestion, ...(prev ?? [])]);
-    setCurrentPage(1);
-  };
+  const { currentItems: currentQuestions, totalPages } = getPaginatedData(
+    questions,
+    currentPage,
+  );
 
   return (
     <section
@@ -96,7 +51,7 @@ function QuestionStudent({
         <IconButton iconName="more" shape="square" aria-label="메뉴 열기" />
       </div>
       <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2 bg-black-0 border-x border-b border-black-200 rounded-b-[20px] w-[520px]">
-        <QuestionInputCard onSubmit={handleSubmitQuestion} />
+        <QuestionInputCard onSubmit={onSubmitQuestion} />
         <div className="w-full flex flex-col gap-2" aria-label="질문 목록">
           {questions.length === 0 ? (
             <p className="w-full text-center py-4 body-regular text-black-200">
@@ -107,13 +62,7 @@ function QuestionStudent({
               {currentQuestions.map((question) => (
                 <QuestionCard
                   key={question.id}
-                  userName={question.userName}
-                  createAt={question.createAt}
-                  content={question.content}
-                  likeCount={question.likeCount}
-                  isCompleted={question.isCompleted}
-                  isLiked={question.isLiked}
-                  userId={question.userId}
+                  question={question}
                   currentUserId={currentUserId}
                   userRole="student"
                 />
@@ -122,7 +71,7 @@ function QuestionStudent({
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
-                  onPageChange={setCurrentPage}
+                  onPageChange={onPageChange}
                 />
               </div>
             </div>

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 
@@ -20,40 +19,20 @@ interface QuestionTeacherProps {
   widgetName?: string;
   widgetDescription?: string;
   currentUserId?: string;
+  questions: Question[];
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
-
-const MOCK_QUESTIONS: Question[] = [
-  {
-    id: '1',
-    userName: '홍길동',
-    createAt: new Date('2026-03-21T14:30:00'),
-    content: '교수님, 중간고사 범위는 어디까지인가요?',
-    likeCount: 3,
-    isCompleted: false,
-    isLiked: false,
-    userId: 'user123',
-  },
-  {
-    id: '2',
-    userName: '김철수',
-    createAt: new Date('2026-03-22T09:00:00'),
-    content: '지난 수업 때 말씀하신 참고도서 제목이 기억이 안 나요.',
-    likeCount: 1,
-    isCompleted: true,
-    isLiked: true,
-    userId: 'user456',
-  },
-];
 
 function QuestionTeacher({
   widgetName = '질문',
   widgetDescription = '학생들이 남긴 질문을 확인하세요.',
   currentUserId = 'teacher',
+  questions,
+  currentPage,
+  onPageChange,
 }: QuestionTeacherProps) {
-  const [questions] = useState<Question[]>(MOCK_QUESTIONS);
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
   const totalPages = Math.ceil((questions?.length ?? 0) / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentQuestions =
@@ -88,14 +67,7 @@ function QuestionTeacher({
           <div className="w-full flex flex-col gap-2" aria-label="질문 목록">
             {currentQuestions.map((question) => (
               <QuestionCard
-                key={question.id}
-                userName={question.userName}
-                createAt={question.createAt}
-                content={question.content}
-                likeCount={question.likeCount}
-                isCompleted={question.isCompleted}
-                isLiked={question.isLiked}
-                userId={question.userId}
+                question={question}
                 currentUserId={currentUserId}
                 userRole="teacher"
               />
@@ -104,7 +76,7 @@ function QuestionTeacher({
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
-                onPageChange={setCurrentPage}
+                onPageChange={onPageChange}
               />
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import type { Question } from '../../types/index';
 
 const questionCardVariants = cva(
   'w-122 bg-black-0 border-black-50 rounded-2xl border-1 ',
@@ -34,32 +35,19 @@ const likeButtonVariants = cva(
 );
 
 interface QuestionCardProps extends VariantProps<typeof questionCardVariants> {
-  userName: string;
-  createAt: Date;
-  content: string;
-  likeCount: number;
-  isCompleted: boolean;
-  isLiked: boolean;
-  className?: string;
-
-  userId: string;
+  question: Question;
   currentUserId: string;
   userRole: 'teacher' | 'student';
+  className?: string;
 }
 
 function QuestionCard({
-  userName,
-  createAt,
-  content,
-  likeCount,
-  isCompleted,
-  isLiked,
-  className,
-  userId,
+  question,
   currentUserId,
   userRole,
+  className,
 }: QuestionCardProps) {
-  const isMyPost = userId === currentUserId;
+  const isMyPost = question.userId === currentUserId;
   const isTeacher = userRole === 'teacher';
   const canShowOptions = isTeacher || isMyPost;
 
@@ -69,7 +57,7 @@ function QuestionCard({
   //   return [];
   // };
 
-  const [isLike, setIsLike] = useState(isLiked);
+  const [isLike, setIsLike] = useState(question.isLiked);
   const handleClickLike = () => {
     setIsLike(!isLike);
   };
@@ -77,21 +65,23 @@ function QuestionCard({
   return (
     <section
       className={cn(
-        questionCardVariants({ state: isCompleted ? 'complete' : 'default' }),
+        questionCardVariants({
+          state: question.isCompleted ? 'complete' : 'default',
+        }),
         'group relative transition-all',
         className,
       )}
     >
-      <div className="flex justify-between px-[14px] pt-[14px] pb-0 items-top h-6.5">
+      <div className="flex justify-between px-3.5 pt-3.5 pb-0 items-top h-6.5">
         <div className="flex p-0 m-0 gap-[10px]">
-          <span className="label-regular">{userName}</span>
+          <span className="label-regular">{question.userName}</span>
           <time
-            dateTime={createAt.toISOString()}
+            dateTime={question.createAt.toISOString()}
             className="caption-regular text-black-300"
           >
-            {format(createAt, 'yyyy-MM-dd HH:mm')} 작성됨
+            {format(question.createAt, 'yyyy-MM-dd HH:mm')} 작성됨
           </time>
-          {isCompleted && (
+          {question.isCompleted && (
             <div className="flex px-[5px] gap-0.5 h-3 bg-widget-note-bg-sel text-widget-note-border-sel caption-regular rounded-xl">
               <img
                 src="src/features/question/asset/check.svg"
@@ -103,10 +93,10 @@ function QuestionCard({
             </div>
           )}
         </div>
-        {canShowOptions && !isCompleted && (
+        {canShowOptions && !question.isCompleted && (
           <button
             type="button"
-            className="opacity-0 flex justify-center items-center px-0.5 rounded-sm  h-[18px]  group-hover:opacity-100 hover:bg-black-50"
+            className="opacity-0 flex justify-center items-center px-0.5 rounded-sm  h-4.5  group-hover:opacity-100 hover:bg-black-50"
             onClick={() => {
               // const menus = getMenuItems();
               // console.log(`${userRole}용 메뉴:`, menus);
@@ -121,8 +111,8 @@ function QuestionCard({
           </button>
         )}
       </div>
-      <div className="flex flex-col items-start px-[14px] py-[10px] gap-[10px]">
-        <p className="description-medium text-black-500">{content}</p>
+      <div className="flex flex-col items-start px-3.5 py-2.5 gap-2.5">
+        <p className="description-medium text-black-500">{question.content}</p>
         <div className="w-full">
           <button
             className={cn(
@@ -130,14 +120,14 @@ function QuestionCard({
             )}
             type="button"
             onClick={handleClickLike}
-            disabled={isCompleted}
-            aria-label={`좋아요 ${likeCount}개`}
+            disabled={question.isCompleted}
+            aria-label={`좋아요 ${question.likeCount}개`}
           >
             <img
               src={`src/features/question/asset/${isLike ? 'thumbs-up-fill' : 'thumbs-up'}.svg`}
               alt="like"
             />
-            {likeCount}
+            {question.likeCount}
           </button>
         </div>
       </div>
