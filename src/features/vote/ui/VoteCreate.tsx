@@ -74,7 +74,7 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
           title="안건"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="예: 홍길동"
+          placeholder="예: 시험 일정"
         />
         <label
           htmlFor="vote-description"
@@ -86,7 +86,7 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
               id="vote-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="예: 홍길동"
+              placeholder="예: 원활한 시험 진행을 위해 응시 가능한 시험 일정에 모두 투표해주세요."
               className="flex-1 resize-none bg-transparent outline-none body-regular text-black-500 placeholder:text-black-200 h-full"
             />
           </div>
