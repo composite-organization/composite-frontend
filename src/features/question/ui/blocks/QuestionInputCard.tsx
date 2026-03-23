@@ -1,5 +1,4 @@
-import TextareaAutosize from 'react-textarea-autosize';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 interface QuestionInputCardProps {
@@ -9,6 +8,16 @@ interface QuestionInputCardProps {
 function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
   const [content, setContent] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [content]);
 
   const handleAnonymousButton = () => {
     setIsAnonymous(!isAnonymous);
@@ -25,8 +34,10 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
       className="flex flex-col w-122 px-3 py-3 rounded-2xl border-1 border-black-50 gap-3"
       aria-label="질문 작성"
     >
-      <TextareaAutosize
-        className="w-full resize-none border-none outline-none description-medium placeholder:text-black-300"
+      <textarea
+        ref={textareaRef}
+        rows={1}
+        className="w-full resize-none border-none outline-none description-medium placeholder:text-black-300 max-h-25 overflow-y-auto"
         placeholder="질문을 입력하세요..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -53,7 +64,7 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
           type="button"
           onClick={handleSubmit}
           className={cn(
-            'flex items-center h-5 px-[6px] py-1 gap-1 rounded-xl bg-black-100 caption-semibold text-black-0',
+            'flex items-center h-5 px-1.5 py-1 gap-1 rounded-xl bg-black-100 caption-semibold text-black-0',
             content.length > 5 ? 'bg-blue-300' : '',
           )}
           disabled={content.length <= 5}
