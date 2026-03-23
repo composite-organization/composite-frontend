@@ -91,8 +91,8 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
             />
           </div>
         </label>
-        <fieldset className="flex flex-col items-center gap-3 w-full border-none p-0 m-0">
-          <legend className="h3-semibold text-black-500 w-full">선택지</legend>
+        <div className="flex flex-col items-center gap-3 w-full">
+          <span className="h3-semibold text-black-500 w-full">선택지</span>
           <SelectionList
             variant="editable"
             selections={selections}
@@ -100,7 +100,7 @@ function VoteCreate({ isOpen, onCancel, onSubmit }: VoteCreateProps) {
             onRemove={handleRemoveSelection}
           />
           <SelectionAddButton onClick={handleAddSelection} className="w-full" />
-        </fieldset>
+        </div>
         <Option options={voteOptions} onToggle={handleToggleOption} />
       </div>
       <div className="flex flex-row items-center gap-9 w-full">
