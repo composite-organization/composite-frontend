@@ -6,27 +6,24 @@ const meta: Meta<typeof QuestionCard> = {
   component: QuestionCard,
   tags: ['autodocs'],
   args: {
-    userName: '홍길동',
-    createAt: new Date('2026-03-21T14:30:00'),
-    content:
-      '교수님, 중간고사 범위는 어디까지인가요? 전범위인가요 아니면 특정 챕터인가요?',
-    likeCount: 3,
-    isCompleted: false,
-    isLiked: false,
-    userId: 'user123',
     currentUserId: 'user123',
     userRole: 'student',
+    question: {
+      id: '1',
+      userName: '홍길동',
+      createAt: new Date('2026-03-23T10:00:00'),
+      content:
+        '교수님, 이 부분 코드가 잘 이해가 안 가는데 다시 설명해 주실 수 있나요? \n 본인이 작성한 글입니다. 수정 및 삭제가 가능합니다.',
+      likeCount: 5,
+      isCompleted: false,
+      isLiked: false,
+      userId: 'user123',
+    },
   },
   argTypes: {
     userRole: {
       control: 'radio',
       options: ['teacher', 'student'],
-    },
-    isCompleted: {
-      control: 'boolean',
-    },
-    isLiked: {
-      control: 'boolean',
     },
   },
 };
@@ -34,87 +31,52 @@ const meta: Meta<typeof QuestionCard> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  args: {
-    isCompleted: false,
-  },
-};
+export const Default: Story = {};
 
 export const Completed: Story = {
   args: {
-    isCompleted: true,
+    question: {
+      id: '2',
+      userName: '홍길동',
+      createAt: new Date('2026-03-23T09:00:00'),
+      content: '답변 완료 상태입니다.',
+      likeCount: 2,
+      isCompleted: true,
+      isLiked: false,
+      userId: 'user123',
+    },
   },
 };
 
 export const TeacherView: Story = {
   args: {
     userRole: 'teacher',
-    currentUserId: 'teacher123',
-    userId: 'student123',
+    currentUserId: 'teacher_id',
+    question: {
+      id: '3',
+      userName: '김철수',
+      createAt: new Date('2026-03-23T11:00:00'),
+      content: '과제 제출 기한이 언제까지인가요?',
+      likeCount: 10,
+      isCompleted: false,
+      isLiked: true,
+      userId: 'student_id',
+    },
   },
 };
 
 export const OthersPost: Story = {
   args: {
-    currentUserId: 'myId',
-    userId: 'othersId',
+    currentUserId: 'my_id',
+    question: {
+      id: '4',
+      userName: '이영희',
+      createAt: new Date('2026-03-23T12:00:00'),
+      content: '이 문제는 스택으로 푸는 게 맞나요?',
+      likeCount: 3,
+      isCompleted: false,
+      isLiked: false,
+      userId: 'others_id',
+    },
   },
-};
-
-export const AllVariants: Story = {
-  render: () => (
-    <div className="flex flex-col gap-6 items-center">
-      <div>내 질문 (학생)</div>
-      <QuestionCard
-        userName="홍길동"
-        createAt={new Date()}
-        content="내가 작성한 질문입니다. 수정/삭제 메뉴가 보여야 합니다."
-        likeCount={5}
-        isCompleted={false}
-        isLiked={false}
-        userId="me"
-        currentUserId="me"
-        userRole="student"
-      />
-
-      <div>다른 학생의 질문</div>
-      <QuestionCard
-        userName="김철수"
-        createAt={new Date()}
-        content="다른 학생이 작성한 질문입니다. 메뉴가 보이지 않아야 합니다."
-        likeCount={12}
-        isCompleted={false}
-        isLiked
-        userId="other"
-        currentUserId="me"
-        userRole="student"
-      />
-
-      <div>교수님 시점</div>
-      <QuestionCard
-        userName="이영희"
-        createAt={new Date()}
-        content="교수님이 보는 학생의 질문입니다. 완료/삭제 메뉴가 보여야 합니다."
-        likeCount={8}
-        isCompleted={false}
-        isLiked={false}
-        userId="student"
-        currentUserId="teacher"
-        userRole="teacher"
-      />
-
-      <div>완료된 질문</div>
-      <QuestionCard
-        userName="박지성"
-        createAt={new Date()}
-        content="이미 답변이 완료된 질문입니다. 배경색이 변하고 좋아요가 비활성화됩니다."
-        likeCount={20}
-        isCompleted
-        isLiked={false}
-        userId="student"
-        currentUserId="teacher"
-        userRole="teacher"
-      />
-    </div>
-  ),
 };
