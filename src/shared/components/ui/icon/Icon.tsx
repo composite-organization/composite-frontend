@@ -22,13 +22,20 @@ type IconName =
 interface IconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   name: IconName;
   size?: number;
+  decorative?: boolean;
 }
 
-function Icon({ name, size = 16, className, ...props }: IconProps) {
+function Icon({
+  name,
+  size = 16,
+  className,
+  decorative = false,
+  ...props
+}: IconProps) {
   return (
     <img
       src={`/assets/icons/${name}.svg`}
-      alt={name}
+      alt={decorative ? '' : name}
       width={size}
       height={size}
       className={className}

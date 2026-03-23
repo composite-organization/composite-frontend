@@ -15,9 +15,9 @@ function Option({ options, onToggle }: OptionProps) {
   return (
     <div className="flex flex-col gap-5 w-full">
       <span className="h3-semibold text-black-500">설정</span>
-      <div className="flex flex-col gap-2.5 w-full">
+      <ul className="flex flex-col gap-2.5 w-full">
         {options.map((option) => (
-          <div
+          <li
             key={option.id}
             className="flex flex-row justify-between items-center w-full h-4.5"
           >
@@ -27,9 +27,9 @@ function Option({ options, onToggle }: OptionProps) {
               onChange={(nextEnabled) => onToggle(option.id, nextEnabled)}
               ariaLabel={option.label}
             />
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

@@ -58,7 +58,7 @@ function IconButton({
         className,
       )}
     >
-      <Icon name={iconName} size={16} />
+      <Icon name={iconName} size={16} decorative />
       {label && (
         <span className={cn('body-medium text-black-500', labelClassName)}>
           {label}
