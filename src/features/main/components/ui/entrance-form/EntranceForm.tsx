@@ -1,15 +1,25 @@
-import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import Input from '@/shared/components/ui/input/Input';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
+
+const lessonCodeSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1, '수업 코드를 입력해주세요.')
+    .regex(/^[A-Z0-9]{8}$/, '수업 코드는 영문 대문자와 숫자 8자리여야 합니다.'),
+});
+
+type LessonCodeFormValues = z.infer<typeof lessonCodeSchema>;
 
 interface EntranceFormProps {
   id: string;
   description: string;
   title: string;
   placeholder: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onAction?: () => void;
+  onSubmitCode: (code: string) => void;
 }
 
 function EntranceForm({
@@ -17,16 +27,26 @@ function EntranceForm({
   description,
   title,
   placeholder,
-  value,
-  onChange,
-  onAction,
+  onSubmitCode,
 }: EntranceFormProps) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onAction?.();
-  };
+  const { register, handleSubmit } = useForm<LessonCodeFormValues>({
+    resolver: zodResolver(lessonCodeSchema),
+    defaultValues: {
+      code: '',
+    },
+  });
+
+  const onSubmit = handleSubmit(
+    (data) => {
+      onSubmitCode(data.code.trim());
+    },
+    (error) => {
+      alert(error.code?.message ?? '입력값이 올바르지 않습니다');
+    },
+  );
+
   return (
-    <form className="flex flex-col gap-2.5 w-full" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-2.5 w-full" onSubmit={onSubmit}>
       <div className="body-regular text-black-300">{description}</div>
       <label htmlFor={id} className="h3-semibold text-black-500">
         {title}
@@ -36,8 +56,7 @@ function EntranceForm({
           id={id}
           state="default"
           placeholder={placeholder}
-          value={value}
-          onChange={onChange}
+          {...register('code')}
           wrapperClassName="h-12 py-0"
         />
         <IconButton
