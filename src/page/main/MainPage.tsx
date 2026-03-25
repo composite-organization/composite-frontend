@@ -1,16 +1,41 @@
 import { useState } from 'react';
+import { WIDGET_DATA } from '@/features/main/data/widgetData';
 import EntranceSection from '@/features/main/components/ui/entrance-section/EntranceSection';
 import HeroSection from '@/features/main/components/ui/hero-section/HeroSection';
 import SectionDivider from '@/features/main/components/ui/section-divider/SectionDivider';
 import WidgetDescriptionCard from '@/features/main/components/ui/widget-description-card/WidgetDescriptionCard';
 import VideoSection from '@/features/main/components/ui/video-section/VideoSection';
-import { WIDGET_DATA } from '@/features/main/data/widgetData';
+import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/JoinLessonModal';
+import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
+import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
+type ModalType = 'join' | 'find' | 'create' | null;
 
 export default function MainPage() {
   const [selectedWidgetId, setSelectedWidgetId] =
     useState<SelectedId>('question');
+  const [openedModal, setOpenedModal] = useState<ModalType>(null);
+
+  const [submittedJoinCode, setSubmittedJoinCode] = useState('');
+  const [submittedFindCode, setSubmittedFindCode] = useState('');
+  const [lessonCode, setLessonCode] = useState<string>('');
+
+  const handleCloseModal = () => {
+    setOpenedModal(null);
+  };
+  const handleJoin = (code: string) => {
+    setSubmittedJoinCode(code);
+    setOpenedModal('join');
+  };
+  const handleFind = (code: string) => {
+    setSubmittedFindCode(code);
+    setOpenedModal('find');
+  };
+  const handleCreateCode = () => {
+    setLessonCode('ABCD1234');
+    setOpenedModal('create');
+  };
 
   return (
     <main className="flex px-30 py-10">
@@ -24,7 +49,11 @@ export default function MainPage() {
           </div>
           <div className="flex flex-col justify-between w-[500px]">
             <HeroSection />
-            <EntranceSection />
+            <EntranceSection
+              onJoin={handleJoin}
+              onFind={handleFind}
+              onCreate={handleCreateCode}
+            />
           </div>
         </section>
         <section className="flex flex-col gap-8 w-full">
@@ -46,6 +75,27 @@ export default function MainPage() {
           </div>
         </section>
       </div>
+      {openedModal === 'join' && (
+        <JoinLessonModal
+          lessonCode={submittedJoinCode}
+          isOpen
+          onClose={handleCloseModal}
+        />
+      )}
+      {openedModal === 'find' && (
+        <FindLessonModal
+          lessonCode={submittedFindCode}
+          isOpen
+          onClose={handleCloseModal}
+        />
+      )}
+      {openedModal === 'create' && (
+        <CreateLessonModal
+          isOpen
+          onClose={handleCloseModal}
+          lessonCode={lessonCode}
+        />
+      )}
     </main>
   );
 }
