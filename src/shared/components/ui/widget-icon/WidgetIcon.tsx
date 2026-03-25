@@ -2,14 +2,7 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import Icon from '@/shared/components/ui/icon/Icon';
-
-export type WidgetName =
-  | 'info'
-  | 'note'
-  | 'file'
-  | 'quiz'
-  | 'vote'
-  | 'question';
+import { type WidgetName } from '@/shared/types/widget.type';
 
 const iconWidgetVariants = cva(
   'inline-flex items-center justify-center shrink-0 rounded-lg transition-colors hover:brightness-95',

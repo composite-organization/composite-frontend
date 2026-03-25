@@ -17,11 +17,6 @@ const meta: Meta<typeof WidgetIcon> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const InfoIcon: Story = {
-  args: {
-    iconName: 'info',
-  },
-};
 export const NoteIcon: Story = {
   args: {
     iconName: 'note',
@@ -52,7 +47,6 @@ export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row gap-3 items-center">
-        <WidgetIcon iconName="info" />
         <WidgetIcon iconName="note" />
         <WidgetIcon iconName="file" />
         <WidgetIcon iconName="quiz" />
