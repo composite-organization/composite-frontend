@@ -8,7 +8,7 @@ const selectableButtonVariants = cva(
   {
     variants: {
       variant: {
-        like: 'bg-black-100 text-black-500',
+        like: 'bg-black-100 text-black-300',
       },
       size: {
         xxs: 'h-4 px-2 gap-0.5 rounded-3xl caption-regular',
