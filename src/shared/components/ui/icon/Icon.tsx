@@ -1,4 +1,4 @@
-type IconName =
+export type IconName =
   | 'add'
   | 'close'
   | 'copy'
@@ -17,7 +17,18 @@ type IconName =
   | 'question'
   | 'module'
   | 'PC'
-  | 'chat';
+  | 'chat'
+  | 'next-fill'
+  | 'next-lite'
+  | 'prev-fill'
+  | 'prev-lite'
+  | 'check'
+  | 'send'
+  | 'thumbs-up-fill'
+  | 'thumbs-up'
+  | 'person-check'
+  | 'person-cross'
+  | 'question-more';
 
 interface IconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   name: IconName;
