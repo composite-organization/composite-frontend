@@ -8,7 +8,7 @@ const selectableButtonVariants = cva(
   {
     variants: {
       variant: {
-        like: 'bg-black-100 text-black-500 hover:bg-black-200',
+        like: 'bg-black-100 text-black-500',
       },
       size: {
         xxs: 'h-4 px-2 gap-0.5 rounded-3xl caption-regular',
@@ -24,8 +24,7 @@ const selectableButtonVariants = cva(
       {
         variant: 'like',
         isSelected: true,
-        className:
-          'bg-widget-question-bg-sel text-blue-300 hover:bg-widget-question-bg-sel/80',
+        className: 'bg-widget-question-bg-sel text-blue-300',
       },
     ],
     defaultVariants: {
