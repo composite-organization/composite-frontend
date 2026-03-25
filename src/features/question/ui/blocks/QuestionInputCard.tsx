@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import IconButton from '@/shared/components/ui/icon-button/IconButton';
 
 interface QuestionInputCardProps {
   onSubmit?: (content: string, isAnonymous: boolean) => void;
@@ -44,39 +45,36 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
         aria-label="질문 내용 입력"
       />
       <div className="flex items-center justify-between p-0">
-        <button
+        <IconButton
           type="button"
           onClick={handleAnonymousButton}
           className={cn(
-            'flex items-center justify-between h-4 px-1.5 py-0.5 gap-1 rounded-md bg-black-100 caption-semibold text-black-300',
-            isAnonymous ? 'bg-black-500 text-black-0' : '',
+            'flex items-center justify-between h-4 px-1.5 py-0.5 gap-1 rounded-md bg-black-100 caption-semibold text-black-300 w-fit',
+            isAnonymous ? 'bg-black-500 text-black-0 hover:bg-black-400' : '',
+          )}
+          iconName={isAnonymous ? 'person-cross' : 'person-check'}
+          iconSize={12}
+          label={isAnonymous ? '익명' : '실명'}
+          labelClassName={cn(
+            'caption-semibold',
+            isAnonymous ? 'text-black-0' : 'text-black-300',
           )}
           aria-label={isAnonymous ? '실명으로 전환' : '익명으로 전환'}
-        >
-          <img
-            src={`src/features/question/asset/${isAnonymous ? 'person-cross' : 'person-check'}.svg`}
-            alt="person"
-            width={12}
-          />
-          {isAnonymous ? '익명' : '실명'}
-        </button>
-        <button
+        />
+        <IconButton
           type="button"
           onClick={handleSubmit}
           className={cn(
-            'flex items-center h-5 px-1.5 py-1 gap-1 rounded-xl bg-black-100 caption-semibold text-black-0',
-            content.length > 5 ? 'bg-blue-300' : '',
+            'flex items-center h-5 px-1.5 py-1 gap-1 rounded-xl bg-black-100 caption-semibold text-black-0 w-fit',
+            content.length > 5 ? 'bg-blue-300 hover:bg-blue-200' : '',
           )}
           disabled={content.length <= 5}
+          iconName="send"
+          iconSize={12}
+          label="등록"
+          labelClassName="caption-semibold text-black-0"
           aria-label="질문 등록"
-        >
-          <img
-            src="src/features/question/asset/send.svg"
-            alt="send"
-            width={12}
-          />
-          등록
-        </button>
+        />
       </div>
     </section>
   );

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import Icon from '@/shared/components/ui/icon/Icon';
+import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import type { Question } from '../../types/index';
 
 const questionCardVariants = cva(
@@ -20,12 +22,12 @@ const questionCardVariants = cva(
 );
 
 const likeButtonVariants = cva(
-  'flex px-2 py-0 gap-0.5 bg-black-100 rounded-3xl caption-regular',
+  'flex items-center px-2 h-[15px] gap-0.5 bg-black-100 rounded-3xl caption-regular ',
   {
     variants: {
       state: {
         default: '',
-        like: 'bg-widget-question-bg-sel',
+        like: 'bg-widget-question-bg-sel text-blue-300',
       },
     },
     defaultVariants: {
@@ -82,33 +84,23 @@ function QuestionCard({
             {format(question.createAt, 'yyyy-MM-dd HH:mm')} 작성됨
           </time>
           {question.isCompleted && (
-            <div className="flex px-[5px] gap-0.5 h-3 bg-widget-note-bg-sel text-widget-note-border-sel caption-regular rounded-xl">
-              <img
-                src="src/features/question/asset/check.svg"
-                alt="check"
-                width={10}
-                height={10}
-              />
+            <div className="flex items-center px-[5px] gap-0.5 h-3 bg-widget-note-bg-sel text-widget-note-border-sel caption-regular rounded-xl">
+              <Icon name="check" size={10} alt="check" />
               완료
             </div>
           )}
         </div>
         {canShowOptions && !question.isCompleted && (
-          <button
-            type="button"
-            className="opacity-0 flex justify-center items-center px-0.5 rounded-sm  h-4.5  group-hover:opacity-100 hover:bg-black-50"
+          <IconButton
+            iconName="question-more"
+            iconSize={12}
+            className="opacity-0 flex justify-center items-center px-0.5 rounded-sm h-4.5 group-hover:opacity-100 hover:bg-black-50 w-fit"
             onClick={() => {
               // const menus = getMenuItems();
               // console.log(`${userRole}용 메뉴:`, menus);
             }}
             aria-label="옵션 더보기"
-          >
-            <img
-              src="src/features/question/asset/more.svg"
-              alt="more"
-              width={18}
-            />
-          </button>
+          />
         )}
       </div>
       <div className="flex flex-col items-start px-3.5 py-2.5 gap-2.5">
@@ -123,8 +115,9 @@ function QuestionCard({
             disabled={question.isCompleted}
             aria-label={`좋아요 ${question.likeCount}개`}
           >
-            <img
-              src={`src/features/question/asset/${isLike ? 'thumbs-up-fill' : 'thumbs-up'}.svg`}
+            <Icon
+              name={isLike ? 'thumbs-up-fill' : 'thumbs-up'}
+              size={10}
               alt="like"
             />
             {question.likeCount}

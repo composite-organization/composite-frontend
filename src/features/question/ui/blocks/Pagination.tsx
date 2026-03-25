@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import IconButton from '@/shared/components/ui/icon-button/IconButton';
 
 interface PaginationProps {
   currentPage: number;
@@ -11,7 +12,6 @@ function Pagination({
   totalPages,
   onPageChange,
 }: PaginationProps) {
-  const assetPath = 'src/features/question/asset';
   const PAGE_GROUP_SIZE = 5;
 
   const currentGroup = Math.floor((currentPage - 1) / PAGE_GROUP_SIZE);
@@ -40,18 +40,15 @@ function Pagination({
       className="flex items-center justify-center gap-3 w-fit h-12 mx-auto"
       aria-label="페이지 선택"
     >
-      <button
+      <IconButton
         type="button"
         disabled={!hasPrevGroup}
         onClick={handlePrev}
-        className="flex items-center justify-center w-8 h-8 disabled:cursor-not-allowed transition-all"
+        iconName={!hasPrevGroup ? 'prev-lite' : 'prev-fill'}
+        iconSize={14}
         aria-label="이전 페이지 그룹"
-      >
-        <img
-          src={`${assetPath}/${!hasPrevGroup ? 'prev-lite' : 'prev-fill'}.svg`}
-          alt="이전"
-        />
-      </button>
+        className="w-8 h-8 p-0"
+      />
 
       <div className="flex items-center gap-3">
         {pages.map((page) => (
@@ -74,18 +71,15 @@ function Pagination({
         ))}
       </div>
 
-      <button
+      <IconButton
         type="button"
         disabled={!hasNextGroup}
         onClick={handleNext}
-        className="flex items-center justify-center w-8 h-8 disabled:cursor-not-allowed transition-all"
+        iconName={!hasNextGroup ? 'next-lite' : 'next-fill'}
+        iconSize={14}
         aria-label="다음 페이지 그룹"
-      >
-        <img
-          src={`${assetPath}/${!hasNextGroup ? 'next-lite' : 'next-fill'}.svg`}
-          alt="다음"
-        />
-      </button>
+        className="w-8 h-8 p-0"
+      />
     </nav>
   );
 }
