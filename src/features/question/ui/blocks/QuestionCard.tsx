@@ -93,7 +93,6 @@ function QuestionCard({
         {canShowOptions && !question.isCompleted && (
           <IconButton
             iconName="question-more"
-            iconSize={12}
             className="opacity-0 flex justify-center items-center px-0.5 rounded-sm h-4.5 group-hover:opacity-100 hover:bg-black-50 w-fit"
             onClick={() => {
               // const menus = getMenuItems();

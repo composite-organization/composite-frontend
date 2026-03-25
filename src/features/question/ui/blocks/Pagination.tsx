@@ -45,7 +45,7 @@ function Pagination({
         disabled={!hasPrevGroup}
         onClick={handlePrev}
         iconName={!hasPrevGroup ? 'prev-lite' : 'prev-fill'}
-        iconSize={14}
+        size="small"
         aria-label="이전 페이지 그룹"
         className="w-8 h-8 p-0"
       />
@@ -76,7 +76,7 @@ function Pagination({
         disabled={!hasNextGroup}
         onClick={handleNext}
         iconName={!hasNextGroup ? 'next-lite' : 'next-fill'}
-        iconSize={14}
+        size="small"
         aria-label="다음 페이지 그룹"
         className="w-8 h-8 p-0"
       />

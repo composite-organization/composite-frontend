@@ -53,7 +53,7 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
             isAnonymous ? 'bg-black-500 text-black-0 hover:bg-black-400' : '',
           )}
           iconName={isAnonymous ? 'person-cross' : 'person-check'}
-          iconSize={12}
+          size="small"
           label={isAnonymous ? '익명' : '실명'}
           labelClassName={cn(
             'caption-semibold',
@@ -70,7 +70,7 @@ function QuestionInputCard({ onSubmit }: QuestionInputCardProps) {
           )}
           disabled={content.length <= 5}
           iconName="send"
-          iconSize={12}
+          size="small"
           label="등록"
           labelClassName="caption-semibold text-black-0"
           aria-label="질문 등록"
