@@ -26,7 +26,7 @@ function EntranceForm({
     onAction?.();
   };
   return (
-    <form className="flex flex-col gap-[10px] w-full" onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-2.5 w-full" onSubmit={handleSubmit}>
       <div className="body-regular text-black-300">{description}</div>
       <label htmlFor={id} className="h3-semibold text-black-500">
         {title}

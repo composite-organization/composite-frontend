@@ -6,7 +6,7 @@ import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 type IconName = 'info' | 'note' | 'file' | 'quiz' | 'vote' | 'question';
 
 const cardVariants = cva(
-  'flex flex-col w-[280px] p-6 pb-12 gap-4 bg-white rounded-2xl border-2 transition-all overflow-hidden text-left',
+  'flex flex-col w-70 p-6 pb-12 gap-4 bg-white rounded-2xl border-2 transition-all overflow-hidden text-left',
   {
     variants: {
       iconName: {

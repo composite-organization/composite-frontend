@@ -13,7 +13,7 @@ function HeroBadge({ badgeName, label, ...props }: HeroBadgeProps) {
     <Badge
       size="md"
       shape="round"
-      className="bg-black-0 border-1 border-black-200 gap-2 px-5 py-[10px]"
+      className="bg-black-0 border-1 border-black-200 gap-1 px-5 py-2.5"
       {...props}
     >
       <Icon name={badgeName} size={20} />

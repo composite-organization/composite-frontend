@@ -14,33 +14,36 @@ export default function MainPage() {
 
   return (
     <main className="flex px-30 py-10">
-      <div className="flex flex-col items-center w-[1508px] gap-11">
-        <section className="flex w-full gap-30">
-          <div>
-            <VideoSection selectedId={selectedWidgetId} />
+      <div className="flex flex-col items-center  w-[1508px] gap-20">
+        <section className="flex w-full h-155 gap-30 justify-between">
+          <div className="flex flex-1">
+            <VideoSection
+              className="h-full w-full"
+              selectedId={selectedWidgetId}
+            />
           </div>
-          <div className="flex flex-col flex-1 gap-10">
+          <div className="flex flex-col justify-between w-[500px]">
             <HeroSection />
             <EntranceSection />
           </div>
         </section>
-
-        <SectionDivider
-          className="flex items-center"
-          text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
-        />
-
-        <section className="flex gap-3 h-[170px] w-[1508px] justify-between">
-          {WIDGET_DATA.map((widget) => (
-            <WidgetDescriptionCard
-              key={widget.id}
-              iconName={widget.id}
-              title={widget.title}
-              description={widget.description}
-              isSelected={selectedWidgetId === widget.id}
-              onClick={() => setSelectedWidgetId(widget.id)}
-            />
-          ))}
+        <section className="flex flex-col gap-8 w-full">
+          <SectionDivider
+            className="flex items-center"
+            text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
+          />
+          <div className="flex justify-between w-full">
+            {WIDGET_DATA.map((widget) => (
+              <WidgetDescriptionCard
+                key={widget.id}
+                iconName={widget.id}
+                title={widget.title}
+                description={widget.description}
+                isSelected={selectedWidgetId === widget.id}
+                onClick={() => setSelectedWidgetId(widget.id)}
+              />
+            ))}
+          </div>
         </section>
       </div>
     </main>

@@ -31,7 +31,7 @@ function EntranceSection() {
         />
         <button
           type="button"
-          className="w-full px-10 py-4 bg-blue-300 text-black-0 h1-semibold rounded-[16px] cursor-pointer transition-colors hover:bg-black-100"
+          className="w-full px-10 py-4 bg-blue-300 text-black-0 h1-semibold rounded-2xl cursor-pointer transition-colors hover:bg-black-100"
         >
           + 새 수업 만들기
         </button>
