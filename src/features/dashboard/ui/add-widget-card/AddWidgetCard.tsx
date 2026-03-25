@@ -1,15 +1,16 @@
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
-
-type IconName = 'file' | 'note' | 'quiz' | 'vote' | 'question';
+import WidgetIcon, {
+  type WidgetName,
+} from '@/shared/components/ui/widget-icon/WidgetIcon';
 
 const addWidgetCardVariants = cva(
   'flex items-center gap-[10px] border-2 w-full w-min-100 p-4 rounded-[14px] bg-black-0 border-black-100 transition-all duration-200 cursor-pointer',
   {
     variants: {
       widgetName: {
+        info: '',
         question:
           'hover:bg-widget-question-bg hover:border-widget-question-border',
         quiz: 'hover:bg-widget-quiz-bg hover:border-widget-quiz-border',
@@ -28,7 +29,7 @@ interface AddWidgetCardProps
   extends
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof addWidgetCardVariants> {
-  widgetName: IconName;
+  widgetName: WidgetName;
   title: string;
   label: string;
   onClick?: () => void;

@@ -3,7 +3,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import Icon from '@/shared/components/ui/icon/Icon';
 
-type IconName = 'info' | 'note' | 'file' | 'quiz' | 'vote' | 'question';
+export type WidgetName =
+  | 'info'
+  | 'note'
+  | 'file'
+  | 'quiz'
+  | 'vote'
+  | 'question';
 
 const iconWidgetVariants = cva(
   'inline-flex items-center justify-center shrink-0 rounded-lg transition-colors hover:brightness-95',
@@ -28,7 +34,7 @@ interface WidgetIconProps
   extends
     React.HTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof iconWidgetVariants> {
-  iconName: IconName;
+  iconName: WidgetName;
   size?: number;
 }
 

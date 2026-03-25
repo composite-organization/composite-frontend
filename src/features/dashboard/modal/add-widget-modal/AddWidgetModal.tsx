@@ -1,7 +1,6 @@
 import Modal from '@/shared/components/ui/modal/Modal';
 import AddWidgetCard from '../../ui/add-widget-card/AddWidgetCard';
-
-type WidgetName = 'file' | 'note' | 'quiz' | 'vote' | 'question';
+import { type WidgetName } from '@/shared/components/ui/widget-icon/WidgetIcon';
 
 const WIDGET_CARD_INFO = [
   {
@@ -37,8 +36,8 @@ interface AddWidgetModalProps {
 }
 
 function AddWidgetModal({ isOpen, onClose }: AddWidgetModalProps) {
-  const handleClickWidget = (widgetName: WidgetName) => {
-    console.log(`${widgetName} 위젯이 클릭되었습니다.`);
+  const handleClickWidget = (id: WidgetName) => {
+    console.log(`${id} 위젯이 클릭되었습니다.`);
   };
 
   return (
