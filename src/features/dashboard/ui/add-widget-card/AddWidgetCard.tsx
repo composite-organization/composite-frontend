@@ -6,7 +6,7 @@ import WidgetIcon, {
 } from '@/shared/components/ui/widget-icon/WidgetIcon';
 
 const addWidgetCardVariants = cva(
-  'flex items-center gap-[10px] border-2 w-full w-min-100 p-4 rounded-[14px] bg-black-0 border-black-100 transition-all duration-200 cursor-pointer',
+  'flex items-center gap-[10px] border-2 w-full min-w-100 p-4 rounded-[14px] bg-black-0 border-black-100 transition-all duration-200 cursor-pointer',
   {
     variants: {
       widgetName: {
