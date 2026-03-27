@@ -1,20 +1,7 @@
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import Icon from '@/shared/components/ui/icon/Icon';
-
-type IconName =
-  | 'add'
-  | 'close'
-  | 'copy'
-  | 'delete'
-  | 'download'
-  | 'edit'
-  | 'info'
-  | 'link'
-  | 'more'
-  | 'pin'
-  | 'upload';
+import Icon, { type IconName } from '@/shared/components/ui/icon/Icon';
 
 const iconButtonVariants = cva(
   'inline-flex items-center justify-center cursor-pointer transition-colors',
