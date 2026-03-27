@@ -1,17 +1,13 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useFormInput } from '@/features/main/hooks/useFormInput';
 import Modal from '@/shared/components/ui/modal/Modal';
 import Input from '@/shared/components/ui/input/Input';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import Button from '@/shared/components/ui/button/Button';
-
-const createLessonSchema = z.object({
-  lessonName: z.string().trim().min(3, '수업명은 3자리 이상입니다.'),
-  teacherName: z.string().trim().min(1, '수업자명을 입력해주세요'),
-});
-
-type CreateLessonFormValues = z.infer<typeof createLessonSchema>;
+import {
+  validateLessonName,
+  validateTeacherName,
+  VALIDATION_MESSAGES,
+} from '@/features/main/utils/validation';
 
 interface CreateLessonModalProps {
   isOpen: boolean;
@@ -30,52 +26,71 @@ function CreateLessonModal({
   lessonCode,
   onSubmit,
 }: CreateLessonModalProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { isValid },
-  } = useForm<CreateLessonFormValues>({
-    resolver: zodResolver(createLessonSchema),
-    defaultValues: {
-      lessonName: '',
-      teacherName: '',
-    },
-    mode: 'onChange',
-  });
+  const lessonNameInput = useFormInput({ validator: validateLessonName });
+  const teacherNameInput = useFormInput({ validator: validateTeacherName });
+
   const handleCopyLessonCode = async () => {
     await navigator.clipboard.writeText(lessonCode);
   };
-  const onFormSubmit = handleSubmit((data) => {
-    onSubmit?.({
-      lessonName: data.lessonName.trim(),
-      teacherName: data.teacherName.trim(),
-      lessonCode,
-    });
-  });
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (lessonNameInput.isValid && teacherNameInput.isValid) {
+      onSubmit?.({
+        lessonName: lessonNameInput.value.trim(),
+        teacherName: teacherNameInput.value.trim(),
+        lessonCode,
+      });
+      lessonNameInput.reset();
+      teacherNameInput.reset();
+    }
+  };
+
+  const isValid = lessonNameInput.isValid && teacherNameInput.isValid;
 
   return (
     <Modal title="수업 만들기" isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={onFormSubmit} className="flex flex-col w-full gap-8">
-        <Input
-          state="default"
-          title="수업명"
-          placeholder="예: 미적분학 1"
-          {...register('lessonName')}
-        />
-        <Input
-          state="default"
-          title="수업자명"
-          placeholder="예: 홍길동"
-          {...register('teacherName')}
-        />
+      <form onSubmit={handleFormSubmit} className="flex flex-col w-full gap-8">
+        <div className="flex flex-col gap-1.5">
+          <Input
+            {...lessonNameInput}
+            title="수업명"
+            placeholder="예: 미적분학 1"
+          />
+          {lessonNameInput.showError && (
+            <span className="label-regular text-red-500 ml-1">
+              {VALIDATION_MESSAGES.LESSON_NAME}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Input
+            {...teacherNameInput}
+            title="수업자명"
+            placeholder="예: 홍길동"
+          />
+          {teacherNameInput.showError && (
+            <span className="label-regular text-red-500 ml-1">
+              {VALIDATION_MESSAGES.TEACHER_NAME}
+            </span>
+          )}
+        </div>
+
         <div>
           <div className="flex items-end gap-5">
-            <Input state="disabled" title="수업코드" value={lessonCode} />
+            <Input
+              state="disabled"
+              title="수업코드"
+              value={lessonCode}
+              readOnly
+            />
             <IconButton
               iconName="copy"
               onClick={handleCopyLessonCode}
               size="medium"
-              className="w-12 h-12"
+              className="w-16 h-[55px]"
+              type="button"
             />
           </div>
           <span className="label-regular text-red-600">

@@ -1,15 +1,11 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { useFormInput } from '@/features/main/hooks/useFormInput';
 import Modal from '@/shared/components/ui/modal/Modal';
 import Input from '@/shared/components/ui/input/Input';
 import Button from '@/shared/components/ui/button/Button';
-
-const findSchema = z.object({
-  password: z.string().trim().min(6, '비밀번호는 6자 이상입니다'),
-});
-
-type FindFormValues = z.infer<typeof findSchema>;
+import {
+  validatePassword,
+  VALIDATION_MESSAGES,
+} from '@/features/main/utils/validation';
 
 interface FindLessonModalProps {
   lessonCode: string;
@@ -24,40 +20,41 @@ function FindLessonModal({
   onClose,
   onSubmit,
 }: FindLessonModalProps) {
-  const {
-    register,
-    handleSubmit,
-    formState: { isValid },
-  } = useForm<FindFormValues>({
-    resolver: zodResolver(findSchema),
-    defaultValues: {
-      password: '',
-    },
-    mode: 'onChange',
-  });
+  const passwordInput = useFormInput({ validator: validatePassword });
 
-  const onFormSubmit = handleSubmit((data) => {
-    onSubmit?.({
-      password: data.password.trim(),
-      lessonCode,
-    });
-    // console.log(data);
-  });
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput.isValid) {
+      onSubmit?.({
+        password: passwordInput.value.trim(),
+        lessonCode,
+      });
+      passwordInput.reset();
+    }
+  };
 
   return (
     <Modal title="내 수업 찾기" isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={onFormSubmit} className="flex flex-col w-full gap-8">
-        <Input
-          type="password"
-          state="default"
-          title="2차 비밀번호"
-          {...register('password')}
-        />
-        <Button type="submit" variant="blue" size="xl" disabled={!isValid}>
+      <form onSubmit={handleFormSubmit} className="flex flex-col w-full gap-8">
+        <div className="flex flex-col gap-1.5">
+          <Input type="password" {...passwordInput} title="2차 비밀번호" />
+          {passwordInput.showError && (
+            <span className="label-regular text-red-500 ml-1">
+              {VALIDATION_MESSAGES.PASSWORD}
+            </span>
+          )}
+        </div>
+        <Button
+          type="submit"
+          variant="blue"
+          size="xl"
+          disabled={!passwordInput.isValid}
+        >
           수업 참여하기
         </Button>
       </form>
     </Modal>
   );
 }
+
 export default FindLessonModal;
