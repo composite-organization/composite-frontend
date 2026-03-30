@@ -38,7 +38,11 @@ function CreateLessonModal({
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (lessonNameInput.isValid && teacherNameInput.isValid) {
+    if (
+      lessonNameInput.isValid &&
+      teacherNameInput.isValid &&
+      passwordInput.isValid
+    ) {
       onSubmit?.({
         lessonName: lessonNameInput.value.trim(),
         teacherName: teacherNameInput.value.trim(),

@@ -50,7 +50,7 @@ function FindLessonModal({
           size="xl"
           disabled={!passwordInput.isValid}
         >
-          수업 참여하기
+          수업 찾기
         </Button>
       </form>
     </Modal>
