@@ -14,6 +14,7 @@ const inputWrapperVariants = cva(
         default: 'border-black-200 bg-transparent focus-within:border-blue-200',
         selected: 'border-blue-300 bg-transparent',
         disabled: 'border-black-100 bg-black-100',
+        error: 'border-red-500 bg-transparent focus-within:border-red-500',
       },
     },
     compoundVariants: [
@@ -24,6 +25,7 @@ const inputWrapperVariants = cva(
         state: 'disabled',
         className: 'border-none bg-transparent',
       },
+      { variant: 'bare', state: 'error', className: 'border-none' },
     ],
     defaultVariants: {
       variant: 'default',
@@ -87,7 +89,13 @@ function Input({
   const inputId = idProp ?? (title ? generatedId : undefined);
   const isDisabled = state === 'disabled';
 
-  const innerClassName = cn(inputInnerVariants({ variant, state }), className);
+  const innerClassName = cn(
+    inputInnerVariants({
+      variant,
+      state: state === 'error' ? 'default' : state,
+    }),
+    className,
+  );
 
   const inputElement = (
     <div
