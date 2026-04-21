@@ -183,8 +183,20 @@ function DashBoardPage() {
         teacherName={teacherName}
         onOpenModal={handleOpenAddModal}
       />
-      <div className="flex flex-wrap gap-5 p-10">
-        {widgets.map(renderWidget)}
+      <div className="px-30 py-6">
+        {widgets.length === 0 ? (
+          <div className="flex w-full items-center justify-center py-20">
+            <p className="body-medium text-black-200">위젯을 생성해주세요.</p>
+          </div>
+        ) : (
+          <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
+            {widgets.map((widget) => (
+              <div key={widget.id} className="mb-5 break-inside-avoid">
+                {renderWidget(widget)}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <AddWidgetModal
         isOpen={isAddModalOpen}
