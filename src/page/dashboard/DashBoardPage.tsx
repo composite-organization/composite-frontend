@@ -1,5 +1,20 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
@@ -39,6 +54,38 @@ type SimpleWidget = {
 
 type DashboardWidget = QuizWidget | VoteWidget | SimpleWidget;
 
+interface SortableWidgetProps {
+  widget: DashboardWidget;
+  children: React.ReactNode;
+}
+
+function SortableWidget({ widget, children }: SortableWidgetProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: widget.id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      className="mb-5 break-inside-avoid cursor-grab active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  );
+}
+
 function DashBoardPage() {
   const { lessonName = '', teacherName = '' } = useParams<{
     lessonName: string;
@@ -49,6 +96,10 @@ function DashBoardPage() {
     null,
   );
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+  );
 
   function handleOpenAddModal() {
     setIsAddModalOpen(true);
@@ -121,12 +172,22 @@ function DashBoardPage() {
     );
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setWidgets((previous) => {
+      const oldIndex = previous.findIndex((widget) => widget.id === active.id);
+      const newIndex = previous.findIndex((widget) => widget.id === over.id);
+      return arrayMove(previous, oldIndex, newIndex);
+    });
+  }
+
   function renderWidget(widget: DashboardWidget) {
     switch (widget.type) {
       case 'quiz':
         return (
           <QuizTeacher
-            key={widget.id}
             question={widget.question}
             choices={widget.choices}
             correctIndex={widget.correctAnswerIndex}
@@ -138,7 +199,6 @@ function DashBoardPage() {
       case 'vote':
         return (
           <VoteTeacher
-            key={widget.id}
             title={widget.title}
             description={widget.description}
             selections={widget.selections}
@@ -148,18 +208,16 @@ function DashBoardPage() {
       case 'question':
         return (
           <QuestionTeacher
-            key={widget.id}
             questions={[]}
             currentPage={1}
             onPageChange={() => {}}
           />
         );
       case 'note':
-        return <MemoTeacher key={widget.id} />;
+        return <MemoTeacher />;
       case 'file':
         return (
           <LectureMaterialsTeacher
-            key={widget.id}
             materials={[] as LectureMaterial[]}
             onUpload={() => {}}
             onDownload={() => {}}
@@ -189,13 +247,24 @@ function DashBoardPage() {
             <p className="body-medium text-black-200">위젯을 생성해주세요.</p>
           </div>
         ) : (
-          <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
-            {widgets.map((widget) => (
-              <div key={widget.id} className="mb-5 break-inside-avoid">
-                {renderWidget(widget)}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={widgets.map((widget) => widget.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
+                {widgets.map((widget) => (
+                  <SortableWidget key={widget.id} widget={widget}>
+                    {renderWidget(widget)}
+                  </SortableWidget>
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
       <AddWidgetModal
