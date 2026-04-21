@@ -1,13 +1,13 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
 
-interface DashBoardPageProps {
-  lessonName: string;
-  teacherName: string;
-}
-
-function DashBoardPage({ lessonName, teacherName }: DashBoardPageProps) {
+function DashBoardPage() {
+  const { lessonName = '', teacherName = '' } = useParams<{
+    lessonName: string;
+    teacherName: string;
+  }>();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
