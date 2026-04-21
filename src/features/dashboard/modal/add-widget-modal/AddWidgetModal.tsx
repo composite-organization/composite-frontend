@@ -6,13 +6,14 @@ import { type WidgetName } from '@/shared/types/widget.type';
 interface AddWidgetModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectWidget: (id: WidgetName) => void;
 }
 
-function AddWidgetModal({ isOpen, onClose }: AddWidgetModalProps) {
-  const handleClickWidget = (id: WidgetName) => {
-    console.log(`${id} 위젯이 클릭되었습니다.`);
-  };
-
+function AddWidgetModal({
+  isOpen,
+  onClose,
+  onSelectWidget,
+}: AddWidgetModalProps) {
   return (
     <Modal title="위젯 추가" isOpen={isOpen} onClose={onClose}>
       <ul className="flex flex-col gap-[10px]">
@@ -22,7 +23,7 @@ function AddWidgetModal({ isOpen, onClose }: AddWidgetModalProps) {
               widgetName={widget.id}
               title={widget.title}
               label={widget.label}
-              onClick={() => handleClickWidget(widget.id)}
+              onClick={() => onSelectWidget(widget.id)}
             />
           </li>
         ))}
