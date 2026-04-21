@@ -54,14 +54,14 @@ export default function MainPage() {
       <DashboardHeader logoOnly />
       <main className="flex w-full justify-center px-30 py-10">
         <div className="flex flex-col items-center w-full gap-20">
-          <section className="flex w-full h-155 gap-30 justify-between">
-            <div className="flex flex-1">
+          <section className="flex w-full gap-30 justify-between items-stretch">
+            <div className="flex flex-1 min-w-0">
               <VideoSection
                 className="h-full w-full"
                 selectedId={selectedWidgetId}
               />
             </div>
-            <div className="flex flex-col justify-between w-[500px]">
+            <div className="flex flex-col gap-20 w-auto shrink-0">
               <HeroSection />
               <EntranceSection
                 onJoin={handleJoin}
@@ -75,7 +75,7 @@ export default function MainPage() {
               className="flex items-center"
               text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
             />
-            <div className="flex justify-between w-full">
+            <div className="flex gap-9 w-full">
               {WIDGET_DATA.map((widget) => (
                 <WidgetDescriptionCard
                   key={widget.id}
@@ -84,6 +84,7 @@ export default function MainPage() {
                   description={widget.description}
                   isSelected={selectedWidgetId === widget.id}
                   onClick={() => setSelectedWidgetId(widget.id)}
+                  className="flex-1"
                 />
               ))}
             </div>

@@ -26,10 +26,12 @@ function EntranceSection({ onJoin, onFind, onCreate }: EntranceSectionProps) {
           onSubmitCode={onFind}
         />
         <IconButton
-          className="bg-blue-300 text-black-0 w-full h-15 rounded-2xl"
+          className="bg-blue-300 hover:bg-blue-200 w-full h-15 rounded-2xl"
           shape="square"
           iconName="add"
+          iconClassName="invert"
           label="새 수업 만들기"
+          labelClassName="text-black-0"
           onClick={onCreate}
         />
       </div>
