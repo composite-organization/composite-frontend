@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { WIDGET_DATA } from '@/features/main/data/widgetData';
 import EntranceSection from '@/features/main/components/ui/entrance-section/EntranceSection';
 import HeroSection from '@/features/main/components/ui/hero-section/HeroSection';
@@ -13,6 +14,7 @@ type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
 type ModalType = 'join' | 'find' | 'create' | null;
 
 export default function MainPage() {
+  const navigate = useNavigate();
   const [selectedWidgetId, setSelectedWidgetId] =
     useState<SelectedId>('question');
   const [openedModal, setOpenedModal] = useState<ModalType>(null);
@@ -35,6 +37,15 @@ export default function MainPage() {
   const handleCreateCode = () => {
     setLessonCode('ABCD1234');
     setOpenedModal('create');
+  };
+
+  const handleCreateSubmit = (payload: {
+    lessonName: string;
+    teacherName: string;
+    password: string;
+    lessonCode: string;
+  }) => {
+    navigate(`/dashboard/${payload.lessonName}/${payload.teacherName}`);
   };
 
   return (
@@ -94,6 +105,7 @@ export default function MainPage() {
           isOpen
           onClose={handleCloseModal}
           lessonCode={lessonCode}
+          onSubmit={handleCreateSubmit}
         />
       )}
     </main>
