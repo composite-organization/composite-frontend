@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
+import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
 import QuizCreate, { type QuizCreateData } from '@/features/quiz/ui/QuizCreate';
@@ -172,6 +173,11 @@ function DashBoardPage() {
 
   return (
     <div className="w-full">
+      <SiteHeader
+        entryCode={lessonName}
+        dashboardUrl={`/dashboard/${lessonName}/${teacherName}`}
+        participantCount={0}
+      />
       <DashboardHeader
         lessonName={lessonName}
         teacherName={teacherName}

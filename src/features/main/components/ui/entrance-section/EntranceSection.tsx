@@ -26,7 +26,7 @@ function EntranceSection({ onJoin, onFind, onCreate }: EntranceSectionProps) {
           onSubmitCode={onFind}
         />
         <IconButton
-          className="bg-blue-300 text-black-0 w-full h-15"
+          className="bg-blue-300 text-black-0 w-full h-15 rounded-2xl"
           shape="square"
           iconName="add"
           label="새 수업 만들기"

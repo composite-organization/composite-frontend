@@ -1,9 +1,10 @@
 import { cn } from '@/lib/utils';
 
 interface DashboardHeaderProps {
-  entryCode: string;
-  dashboardUrl: string;
-  participantCount: number;
+  logoOnly?: boolean;
+  entryCode?: string;
+  dashboardUrl?: string;
+  participantCount?: number;
 }
 
 function CopyIcon() {
@@ -103,37 +104,41 @@ const pillButtonClass = cn(
 );
 
 function DashboardHeader({
+  logoOnly,
   entryCode,
   dashboardUrl,
   participantCount,
 }: DashboardHeaderProps) {
   function handleDashboardLinkClick() {
+    if (!dashboardUrl) return;
     window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
   }
 
   return (
-    <header className="flex flex-row items-center justify-between w-full bg-blue-300 px-[120px] py-6">
-      <span className="text-black-0 font-semibold text-[30px] leading-[36px]">
+    <header className="flex flex-row items-center justify-between w-full bg-blue-300 px-30 py-6">
+      <span className="text-black-0 font-semibold text-[30px] leading-9">
         Composite
       </span>
-      <div className="flex flex-row items-center gap-[10px]">
-        <button type="button" className={pillButtonClass}>
-          <span>{entryCode}</span>
-          <CopyIcon />
-        </button>
-        <button
-          type="button"
-          className={pillButtonClass}
-          onClick={handleDashboardLinkClick}
-        >
-          <span>link</span>
-          <LinkIcon />
-        </button>
-        <button type="button" className={pillButtonClass}>
-          <span>{participantCount}</span>
-          <PersonIcon />
-        </button>
-      </div>
+      {!logoOnly && (
+        <div className="flex flex-row items-center gap-2.5">
+          <button type="button" className={pillButtonClass}>
+            <span>{entryCode}</span>
+            <CopyIcon />
+          </button>
+          <button
+            type="button"
+            className={pillButtonClass}
+            onClick={handleDashboardLinkClick}
+          >
+            <span>link</span>
+            <LinkIcon />
+          </button>
+          <button type="button" className={pillButtonClass}>
+            <span>{participantCount}</span>
+            <PersonIcon />
+          </button>
+        </div>
+      )}
     </header>
   );
 }
