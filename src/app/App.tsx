@@ -18,21 +18,28 @@ function AppContent() {
     const key = 'composite_guest_token';
     const token = localStorage.getItem(key);
 
+    console.log('[App] Token initialization started. Cached token:', !!token);
+
     if (!token) {
+      console.log('[App] No cached token. Requesting guest credentials...');
       getGuestTokenMutation.mutate(
         { name: 'guest' },
         {
           onSuccess: (data) => {
+            console.log('[App] Guest token received:', data);
             localStorage.setItem(key, data.token);
             setAuthToken(data.token);
+            console.log('[App] Auth token set');
             setIsTokenReady(true);
           },
-          onError: () => {
+          onError: (error) => {
+            console.error('[App] Guest token request failed:', error);
             setIsTokenReady(true);
           },
         },
       );
     } else {
+      console.log('[App] Using cached token');
       setAuthToken(token);
       setIsTokenReady(true);
     }
