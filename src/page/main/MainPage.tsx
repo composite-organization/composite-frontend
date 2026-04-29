@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import { WIDGET_DATA } from '@/features/main/data/widgetData';
@@ -10,9 +10,29 @@ import VideoSection from '@/features/main/components/ui/video-section/VideoSecti
 import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/JoinLessonModal';
 import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
+import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
 type ModalType = 'join' | 'find' | 'create' | null;
+
+function generateLessonCode(): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i += 1) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
+
+function getOrCreateUserId(): string {
+  const key = 'composite_user_id';
+  let userId = localStorage.getItem(key);
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    localStorage.setItem(key, userId);
+  }
+  return userId;
+}
 
 export default function MainPage() {
   const navigate = useNavigate();
@@ -23,6 +43,16 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
+  const [userId] = useState(() => getOrCreateUserId());
+
+  const createLessonMutation = useCreateLessonMutation();
+
+  useEffect(() => {
+    if (createLessonMutation.isSuccess && createLessonMutation.data) {
+      const lesson = createLessonMutation.data;
+      navigate(`/dashboard/${lesson.lessonName}/${lesson.teacherName}`);
+    }
+  }, [createLessonMutation.isSuccess, createLessonMutation.data, navigate]);
 
   const handleCloseModal = () => {
     setOpenedModal(null);
@@ -36,7 +66,7 @@ export default function MainPage() {
     setOpenedModal('find');
   };
   const handleCreateCode = () => {
-    setLessonCode('ABCD1234');
+    setLessonCode(generateLessonCode());
     setOpenedModal('create');
   };
 
@@ -46,7 +76,15 @@ export default function MainPage() {
     password: string;
     lessonCode: string;
   }) => {
-    navigate(`/dashboard/${payload.lessonName}/${payload.teacherName}`);
+    createLessonMutation.mutate({
+      body: {
+        teacherName: payload.teacherName,
+        lessonName: payload.lessonName,
+        lessonCode: payload.lessonCode,
+        password: payload.password,
+      },
+      user: userId,
+    });
   };
 
   return (
@@ -109,6 +147,8 @@ export default function MainPage() {
             isOpen
             onClose={handleCloseModal}
             lessonCode={lessonCode}
+            isLoading={createLessonMutation.isPending}
+            error={createLessonMutation.error?.message || null}
             onSubmit={handleCreateSubmit}
           />
         )}
