@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from '@/page/main/MainPage';
 import DashBoardPage from '@/page/dashboard/DashBoardPage';
@@ -9,6 +9,7 @@ import './App.css';
 function AppContent() {
   const getGuestTokenMutation = useGetGuestTokenMutation();
   const initializedRef = useRef(false);
+  const [isTokenReady, setIsTokenReady] = useState(false);
 
   useEffect(() => {
     if (initializedRef.current) return;
@@ -24,13 +25,26 @@ function AppContent() {
           onSuccess: (data) => {
             localStorage.setItem(key, data.token);
             setAuthToken(data.token);
+            setIsTokenReady(true);
+          },
+          onError: () => {
+            setIsTokenReady(true);
           },
         },
       );
     } else {
       setAuthToken(token);
+      setIsTokenReady(true);
     }
   }, [getGuestTokenMutation]);
+
+  if (!isTokenReady) {
+    return (
+      <div className="flex items-center justify-center w-screen h-screen">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <Routes>
