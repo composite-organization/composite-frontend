@@ -8,6 +8,8 @@ interface MemoTeacherProps {
   widgetDescription?: string;
   initialTitle?: string;
   initialMemo?: string;
+  onTitleChange?: (title: string) => void;
+  onMemoChange?: (memo: string) => void;
 }
 
 function MemoTeacher({
@@ -15,12 +17,24 @@ function MemoTeacher({
   widgetDescription = '위젯 설명',
   initialTitle = '',
   initialMemo = '',
+  onTitleChange,
+  onMemoChange,
 }: MemoTeacherProps) {
   const [title, setTitle] = useState(initialTitle);
   const [memo, setMemo] = useState(initialMemo);
 
+  const handleTitleChange = (newTitle: string) => {
+    setTitle(newTitle);
+    onTitleChange?.(newTitle);
+  };
+
+  const handleMemoChange = (newMemo: string) => {
+    setMemo(newMemo);
+    onMemoChange?.(newMemo);
+  };
+
   return (
-    <div className="flex flex-col w-[520px]">
+    <div className="flex flex-col w-130">
       <div className="flex flex-row justify-between items-center px-4 py-3 h-[60px] bg-white border border-black-200 rounded-t-[20px]">
         <div className="flex flex-row items-center gap-3">
           <WidgetIcon iconName="note" size={36} />
@@ -38,8 +52,8 @@ function MemoTeacher({
           title={title}
           memo={memo}
           isEditable
-          onTitleChange={setTitle}
-          onMemoChange={setMemo}
+          onTitleChange={handleTitleChange}
+          onMemoChange={handleMemoChange}
         />
       </div>
     </div>
