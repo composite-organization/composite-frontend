@@ -15,12 +15,15 @@ function generateMockJWT(name: string): string {
 
 export const guestHandlers = [
   http.post('/guests/credentials', async ({ request }) => {
-    const body = (await request.json()) as Record<string, unknown>;
-    return HttpResponse.json(
-      {
-        token: generateMockJWT(String(body.name)),
-      },
-      { status: 201 },
-    );
+    try {
+      const body = (await request.json()) as Record<string, unknown>;
+      const token = generateMockJWT(String(body.name || 'guest'));
+      return HttpResponse.json({ token }, { status: 201 });
+    } catch {
+      return HttpResponse.json(
+        { error: 'Failed to process request' },
+        { status: 400 },
+      );
+    }
   }),
 ];

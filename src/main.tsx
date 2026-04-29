@@ -6,7 +6,7 @@ import './index.css';
 import App from './app/App';
 
 async function enableMocking(): Promise<void> {
-  if (!import.meta.env.DEV) {
+  if (!import.meta.env.DEV || import.meta.env.VITE_MSW_ENABLED === 'false') {
     return;
   }
   const { worker } = await import('./mocks/browser');
