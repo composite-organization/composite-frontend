@@ -152,17 +152,25 @@ function QuizTeacher({
         onClose={handleCloseEndModal}
       >
         <p className="h3-semibold text-black-500">퀴즈를 종료하시겠습니까?</p>
-        <div className="flex flex-row items-center gap-9">
-          <Button variant="cancel" size="xl" onClick={handleCloseEndModal}>
+        <div className="flex flex-row items-center w-full gap-9">
+          <Button
+            variant="cancel"
+            size="xl"
+            className="flex-1"
+            onClick={handleCloseEndModal}
+          >
             취소
           </Button>
-          <Button variant="blue" size="xl" onClick={handleEndConfirm}>
+          <Button
+            variant="blue"
+            size="xl"
+            className="flex-1"
+            onClick={handleEndConfirm}
+          >
             종료
           </Button>
         </div>
       </Modal>
-
-      {/* eslint-enable react/jsx-no-bind */}
     </div>
   );
 }

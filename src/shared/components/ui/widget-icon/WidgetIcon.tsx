@@ -5,7 +5,7 @@ import Icon from '@/shared/components/ui/icon/Icon';
 import { type WidgetName } from '@/shared/types/widget.type';
 
 const iconWidgetVariants = cva(
-  'inline-flex items-center justify-center shrink-0 rounded-lg transition-colors hover:brightness-95',
+  'inline-flex items-center justify-center shrink-0 rounded-lg',
   {
     variants: {
       iconName: {

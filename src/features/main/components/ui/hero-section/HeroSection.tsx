@@ -15,14 +15,14 @@ function HeroSection({ className }: HeroSectionProps) {
   return (
     <section className={cn('flex flex-col gap-5', className)}>
       <header className="flex flex-col gap-5">
-        <h1 className="h1-bold text-black-500">
+        <h1 className="h1-bold text-black-500 whitespace-nowrap">
           수업 도구를 한 화면에,
           <span className="text-blue-300 "> Composite</span>
         </h1>
-        <p className="h3-semibold text-black-500">
+        <p className="h3-semibold text-black-500 whitespace-nowrap">
           흩어진 수업 도구, 이제 하나로 연결하세요.
         </p>
-        <div className="flex flex-col body-regular text-black-500 gap-[14px]">
+        <div className="flex flex-col body-regular text-black-500 gap-3.5">
           <div>
             여기저기 흩어져 있어 번거로웠던 수업 도구들을{' '}
             <span className="text-blue-300 body-semibold">하나의 화면</span>에
@@ -37,7 +37,7 @@ function HeroSection({ className }: HeroSectionProps) {
           </div>
         </div>
       </header>
-      <ul className="flex flex-row items-center gap-3">
+      <ul className="flex flex-row items-center gap-3.5">
         {HERO_BADGES.map((badge) => (
           <li key={badge.id}>
             <HeroBadge badgeName={badge.name} label={badge.label} />

@@ -12,7 +12,17 @@ type Story = StoryObj<typeof meta>;
 export const Example: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <EntranceSection />
+      <EntranceSection
+        onJoin={() => {
+          console.log('Join');
+        }}
+        onFind={() => {
+          console.log('Find');
+        }}
+        onCreate={() => {
+          console.log('Create');
+        }}
+      />
     </div>
   ),
 };

@@ -134,14 +134,29 @@ function QuizStudent({
         isOpen={isSubmitModalOpen}
         onClose={handleCloseSubmitModal}
       >
-        <p className="h3-semibold text-black-500">
-          선택한 답안을 제출하시겠습니까?
-        </p>
-        <div className="flex flex-row items-center gap-9">
-          <Button variant="cancel" size="xl" onClick={handleCloseSubmitModal}>
+        <div className="flex flex-col gap-8">
+          {selectedIndex !== null && (
+            <p className="h3-semibold text-black-500">
+              정답: {choices[selectedIndex]}
+            </p>
+          )}
+          <p className="h3-semibold text-black-500">제출하시겠습니까?</p>
+        </div>
+        <div className="flex flex-row items-center w-full gap-9">
+          <Button
+            variant="cancel"
+            size="xl"
+            className="flex-1"
+            onClick={handleCloseSubmitModal}
+          >
             취소
           </Button>
-          <Button variant="blue" size="xl" onClick={handleSubmitConfirm}>
+          <Button
+            variant="blue"
+            size="xl"
+            className="flex-1"
+            onClick={handleSubmitConfirm}
+          >
             제출
           </Button>
         </div>

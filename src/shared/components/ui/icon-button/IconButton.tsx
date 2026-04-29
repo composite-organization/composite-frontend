@@ -1,20 +1,7 @@
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
-import Icon from '@/shared/components/ui/icon/Icon';
-
-type IconName =
-  | 'add'
-  | 'close'
-  | 'copy'
-  | 'delete'
-  | 'download'
-  | 'edit'
-  | 'info'
-  | 'link'
-  | 'more'
-  | 'pin'
-  | 'upload';
+import Icon, { type IconName } from '@/shared/components/ui/icon/Icon';
 
 const iconButtonVariants = cva(
   'inline-flex items-center justify-center cursor-pointer transition-colors',
@@ -59,6 +46,7 @@ interface IconButtonProps
   iconName: IconName;
   label?: string;
   labelClassName?: string;
+  iconClassName?: string;
 }
 
 function IconButton({
@@ -68,6 +56,7 @@ function IconButton({
   label,
   className,
   labelClassName,
+  iconClassName,
   ...props
 }: IconButtonProps) {
   return (
@@ -80,7 +69,11 @@ function IconButton({
         className,
       )}
     >
-      <Icon name={iconName} size={iconSizeMap[size ?? 'medium']} />
+      <Icon
+        name={iconName}
+        size={iconSizeMap[size ?? 'medium']}
+        className={iconClassName}
+      />
       {label && (
         <span className={cn('body-medium text-black-500', labelClassName)}>
           {label}

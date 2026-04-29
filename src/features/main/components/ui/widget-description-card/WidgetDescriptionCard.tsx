@@ -6,7 +6,7 @@ import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 type IconName = 'info' | 'note' | 'file' | 'quiz' | 'vote' | 'question';
 
 const cardVariants = cva(
-  'flex flex-col w-[280px] p-6 pb-12 gap-4 bg-white rounded-2xl border-2 transition-all overflow-hidden text-left',
+  'flex flex-col p-6 gap-4 bg-white rounded-2xl border-2 transition-all text-left aspect-[2/1]',
   {
     variants: {
       iconName: {
@@ -114,7 +114,11 @@ function WidgetDescriptionCard({
     <button
       type="button"
       onClick={onClick}
-      className={cn(cardVariants({ iconName, isSelected }), 'cursor-pointer')}
+      className={cn(
+        cardVariants({ iconName, isSelected }),
+        'cursor-pointer',
+        className,
+      )}
       {...props}
     >
       <div className="flex items-center gap-2">
@@ -122,9 +126,9 @@ function WidgetDescriptionCard({
         <span className="body-semibold text-black-500">{title}</span>
       </div>
 
-      <div className="overflow-y-auto">
-        <p className="description-regular text-black-300">{description}</p>
-      </div>
+      <p className="description-regular leading-[normal] text-black-300">
+        {description}
+      </p>
     </button>
   );
 }
