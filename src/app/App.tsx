@@ -22,6 +22,15 @@ function AppContent() {
 
     if (!token) {
       console.log('[App] No cached token. Requesting guest credentials...');
+      setTimeout(() => {
+        console.log('[App] Mutation status:', {
+          isPending: getGuestTokenMutation.isPending,
+          isSuccess: getGuestTokenMutation.isSuccess,
+          isError: getGuestTokenMutation.isError,
+          error: getGuestTokenMutation.error,
+        });
+      }, 1000);
+
       getGuestTokenMutation.mutate(
         { name: 'guest' },
         {
