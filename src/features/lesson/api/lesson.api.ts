@@ -25,20 +25,24 @@ export interface AuthenticateLessonResponse {
 
 export async function createLesson(
   body: CreateLessonRequest,
-  user: string,
+  guestToken: string,
 ): Promise<Lesson> {
   const response = await http.post<Lesson>('/lessons', body, {
-    params: { user },
+    headers: {
+      Authorization: `Bearer ${guestToken}`,
+    },
   });
   return response.data;
 }
 
 export async function fetchLesson(
   lessonCode: string,
-  user: string,
+  guestToken: string,
 ): Promise<Lesson> {
   const response = await http.get<Lesson>(`/lessons/${lessonCode}`, {
-    params: { user },
+    headers: {
+      Authorization: `Bearer ${guestToken}`,
+    },
   });
   return response.data;
 }

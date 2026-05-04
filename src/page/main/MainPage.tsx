@@ -11,6 +11,7 @@ import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/
 import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
+import { getGuestToken } from '@/features/guest/api/guest.api';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
 type ModalType = 'join' | 'find' | 'create' | null;
@@ -24,16 +25,6 @@ function generateLessonCode(): string {
   return code;
 }
 
-function getOrCreateUserId(): string {
-  const key = 'composite_user_id';
-  let userId = localStorage.getItem(key);
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    localStorage.setItem(key, userId);
-  }
-  return userId;
-}
-
 export default function MainPage() {
   const navigate = useNavigate();
   const [selectedWidgetId, setSelectedWidgetId] =
@@ -43,7 +34,6 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
-  const [userId] = useState(() => getOrCreateUserId());
 
   const createLessonMutation = useCreateLessonMutation();
 
@@ -70,21 +60,28 @@ export default function MainPage() {
     setOpenedModal('create');
   };
 
-  const handleCreateSubmit = (payload: {
+  const handleCreateSubmit = async (payload: {
     lessonName: string;
     teacherName: string;
     password: string;
     lessonCode: string;
   }) => {
-    createLessonMutation.mutate({
-      body: {
-        teacherName: payload.teacherName,
-        lessonName: payload.lessonName,
-        lessonCode: payload.lessonCode,
-        password: payload.password,
-      },
-      user: userId,
-    });
+    try {
+      const guestCredentialsResponse = await getGuestToken({
+        name: payload.teacherName,
+      });
+      createLessonMutation.mutate({
+        body: {
+          teacherName: payload.teacherName,
+          lessonName: payload.lessonName,
+          lessonCode: payload.lessonCode,
+          password: payload.password,
+        },
+        guestToken: guestCredentialsResponse.token,
+      });
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
   };
 
   return (
