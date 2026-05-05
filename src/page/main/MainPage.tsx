@@ -11,6 +11,7 @@ import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/
 import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
+import { joinLesson } from '@/features/lesson/api/lesson.api';
 import { getGuestToken } from '@/features/guest/api/guest.api';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
@@ -65,6 +66,26 @@ export default function MainPage() {
   const handleCreateCode = () => {
     setLessonCode(generateLessonCode());
     setOpenedModal('create');
+  };
+
+  const handleJoinSubmit = async (payload: {
+    studentName: string;
+    lessonCode: string;
+  }) => {
+    try {
+      const guestCredentialsResponse = await getGuestToken({
+        name: payload.studentName,
+      });
+      const lesson = await joinLesson(
+        payload.lessonCode,
+        guestCredentialsResponse.token,
+      );
+      navigate(
+        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
   };
 
   const handleCreateSubmit = async (payload: {
@@ -137,6 +158,7 @@ export default function MainPage() {
             lessonCode={submittedJoinCode}
             isOpen
             onClose={handleCloseModal}
+            onSubmit={handleJoinSubmit}
           />
         )}
         {openedModal === 'find' && (

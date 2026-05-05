@@ -1,8 +1,11 @@
 import { http } from '../../../lib/http';
 
 export interface Lesson {
-  lessonName: string;
+  id: number;
   teacherName: string;
+  lessonName: string;
+  lessonCode: string;
+  createdTime: string;
 }
 
 export interface CreateLessonRequest {
@@ -43,6 +46,22 @@ export async function fetchLesson(
       Authorization: `Bearer ${guestToken}`,
     },
   });
+  return response.data;
+}
+
+export async function joinLesson(
+  lessonCode: string,
+  guestToken: string,
+): Promise<Lesson> {
+  const response = await http.post<Lesson>(
+    `/lessons/${lessonCode}/students`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${guestToken}`,
+      },
+    },
+  );
   return response.data;
 }
 
