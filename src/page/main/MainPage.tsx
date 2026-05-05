@@ -11,7 +11,10 @@ import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/
 import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
-import { fetchLesson } from '@/features/lesson/api/lesson.api';
+import {
+  fetchLesson,
+  authenticateLesson,
+} from '@/features/lesson/api/lesson.api';
 import { getGuestToken } from '@/features/guest/api/guest.api';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
@@ -89,6 +92,24 @@ export default function MainPage() {
         payload.lessonCode,
         guestCredentialsResponse.token,
       );
+      navigate(
+        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
+  };
+
+  const handleFindSubmit = async (payload: {
+    password: string;
+    lessonCode: string;
+  }) => {
+    try {
+      const authResponse = await authenticateLesson({
+        lessonCode: payload.lessonCode,
+        password: payload.password,
+      });
+      const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
       navigate(
         `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
       );
@@ -175,6 +196,7 @@ export default function MainPage() {
             lessonCode={submittedFindCode}
             isOpen
             onClose={handleCloseModal}
+            onSubmit={handleFindSubmit}
           />
         )}
         {openedModal === 'create' && (

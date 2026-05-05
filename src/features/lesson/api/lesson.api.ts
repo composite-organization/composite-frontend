@@ -21,8 +21,7 @@ export interface AuthenticateLessonRequest {
 }
 
 export interface AuthenticateLessonResponse {
-  lessonCode: string;
-  authenticated: boolean;
+  token: string;
 }
 
 export async function createLesson(
@@ -52,9 +51,12 @@ export async function fetchLesson(
 export async function authenticateLesson(
   body: AuthenticateLessonRequest,
 ): Promise<AuthenticateLessonResponse> {
-  const response = await http.post<AuthenticateLessonResponse>(
-    '/lessons/authentications',
-    body,
-  );
-  return response.data;
+  const response = await http.post('/lessons/authentications', body);
+  const authorizationHeader: string =
+    response.headers.authorization || response.headers.Authorization;
+  if (!authorizationHeader) throw new Error('Authorization header not found');
+  const token = authorizationHeader.startsWith('Bearer ')
+    ? authorizationHeader.slice(7)
+    : authorizationHeader;
+  return { token };
 }
