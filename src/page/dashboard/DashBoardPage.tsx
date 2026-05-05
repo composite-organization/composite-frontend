@@ -236,11 +236,7 @@ function DashBoardPage() {
 
   return (
     <div className="w-full">
-      <SiteHeader
-        entryCode={lessonCode}
-        dashboardUrl={`/dashboard/${lessonCode}/${lessonName}/${teacherName}`}
-        participantCount={0}
-      />
+      <SiteHeader entryCode={lessonCode} participantCount={0} />
       <DashboardHeader
         lessonName={lessonName}
         teacherName={teacherName}

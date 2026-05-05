@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import { WIDGET_DATA } from '@/features/main/data/widgetData';
 import EntranceSection from '@/features/main/components/ui/entrance-section/EntranceSection';
@@ -28,6 +28,7 @@ function generateLessonCode(): string {
 
 export default function MainPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedWidgetId, setSelectedWidgetId] =
     useState<SelectedId>('question');
   const [openedModal, setOpenedModal] = useState<ModalType>(null);
@@ -37,6 +38,14 @@ export default function MainPage() {
   const [lessonCode, setLessonCode] = useState<string>('');
 
   const createLessonMutation = useCreateLessonMutation();
+
+  useEffect(() => {
+    const lessonCodeParam = searchParams.get('lessonCode');
+    if (lessonCodeParam) {
+      setSubmittedJoinCode(lessonCodeParam);
+      setOpenedModal('join');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {

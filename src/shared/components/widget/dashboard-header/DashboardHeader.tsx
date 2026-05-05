@@ -1,9 +1,9 @@
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface DashboardHeaderProps {
   logoOnly?: boolean;
   entryCode?: string;
-  dashboardUrl?: string;
   participantCount?: number;
 }
 
@@ -106,12 +106,24 @@ const pillButtonClass = cn(
 function DashboardHeader({
   logoOnly,
   entryCode,
-  dashboardUrl,
   participantCount,
 }: DashboardHeaderProps) {
-  function handleDashboardLinkClick() {
-    if (!dashboardUrl) return;
-    window.open(dashboardUrl, '_blank', 'noopener,noreferrer');
+  const [isCodeCopied, setIsCodeCopied] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
+
+  async function handleCopyCodeClick() {
+    if (!entryCode) return;
+    await navigator.clipboard.writeText(entryCode);
+    setIsCodeCopied(true);
+    setTimeout(() => setIsCodeCopied(false), 2000);
+  }
+
+  async function handleCopyStudentLinkClick() {
+    if (!entryCode) return;
+    const studentLinkUrl = `${window.location.origin}/?lessonCode=${entryCode}`;
+    await navigator.clipboard.writeText(studentLinkUrl);
+    setIsLinkCopied(true);
+    setTimeout(() => setIsLinkCopied(false), 2000);
   }
 
   return (
@@ -121,16 +133,20 @@ function DashboardHeader({
       </span>
       {!logoOnly && (
         <div className="flex flex-row items-center gap-2.5">
-          <button type="button" className={pillButtonClass}>
-            <span>{entryCode}</span>
+          <button
+            type="button"
+            className={pillButtonClass}
+            onClick={handleCopyCodeClick}
+          >
+            <span>{isCodeCopied ? '복사됨' : entryCode}</span>
             <CopyIcon />
           </button>
           <button
             type="button"
             className={pillButtonClass}
-            onClick={handleDashboardLinkClick}
+            onClick={handleCopyStudentLinkClick}
           >
-            <span>link</span>
+            <span>{isLinkCopied ? '복사됨' : 'link'}</span>
             <LinkIcon />
           </button>
           <button type="button" className={pillButtonClass}>
