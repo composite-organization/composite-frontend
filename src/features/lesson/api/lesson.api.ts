@@ -1,7 +1,6 @@
 import { http } from '../../../lib/http';
 
 export interface Lesson {
-  lessonCode: string;
   lessonName: string;
   teacherName: string;
 }

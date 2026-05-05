@@ -87,7 +87,12 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
 }
 
 function DashBoardPage() {
-  const { lessonName = '', teacherName = '' } = useParams<{
+  const {
+    lessonCode = '',
+    lessonName = '',
+    teacherName = '',
+  } = useParams<{
+    lessonCode: string;
     lessonName: string;
     teacherName: string;
   }>();
@@ -232,8 +237,8 @@ function DashBoardPage() {
   return (
     <div className="w-full">
       <SiteHeader
-        entryCode={lessonName}
-        dashboardUrl={`/dashboard/${lessonName}/${teacherName}`}
+        entryCode={lessonCode}
+        dashboardUrl={`/dashboard/${lessonCode}/${lessonName}/${teacherName}`}
         participantCount={0}
       />
       <DashboardHeader

@@ -40,9 +40,16 @@ export default function MainPage() {
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
-      navigate(`/dashboard/${lesson.lessonName}/${lesson.teacherName}`);
+      navigate(
+        `/dashboard/${lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
     }
-  }, [createLessonMutation.isSuccess, createLessonMutation.data, navigate]);
+  }, [
+    createLessonMutation.isSuccess,
+    createLessonMutation.data,
+    navigate,
+    lessonCode,
+  ]);
 
   const handleCloseModal = () => {
     setOpenedModal(null);
