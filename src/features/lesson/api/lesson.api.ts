@@ -48,6 +48,32 @@ export async function fetchLesson(
   return response.data;
 }
 
+export interface LessonWidgetIds {
+  memo: number[];
+  quiz: number[];
+  vote: number[];
+  attachment: number[];
+}
+
+export interface GetLessonWidgetIdsResponse {
+  widgets: LessonWidgetIds;
+}
+
+export async function fetchLessonWidgetIds(
+  lessonCode: string,
+  token: string,
+): Promise<GetLessonWidgetIdsResponse> {
+  const response = await http.get<GetLessonWidgetIdsResponse>(
+    `/lessons/${lessonCode}/widgets`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+}
+
 export async function authenticateLesson(
   body: AuthenticateLessonRequest,
 ): Promise<AuthenticateLessonResponse> {

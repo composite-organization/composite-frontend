@@ -88,6 +88,7 @@ export default function MainPage() {
       const guestCredentialsResponse = await getGuestToken({
         name: payload.studentName,
       });
+      localStorage.setItem('authToken', guestCredentialsResponse.token);
       const lesson = await fetchLesson(
         payload.lessonCode,
         guestCredentialsResponse.token,
@@ -110,6 +111,7 @@ export default function MainPage() {
         password: payload.password,
       });
       localStorage.setItem('lessonAuthToken', authResponse.token);
+      localStorage.setItem('authToken', authResponse.token);
       const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
       navigate(
         `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
@@ -129,6 +131,7 @@ export default function MainPage() {
       const guestCredentialsResponse = await getGuestToken({
         name: payload.teacherName,
       });
+      localStorage.setItem('authToken', guestCredentialsResponse.token);
       createLessonMutation.mutate({
         body: {
           teacherName: payload.teacherName,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   DndContext,
@@ -18,6 +18,9 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
+import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
+import { useMemoWidgetsQuery } from '@/features/memo/api/memo.queries';
+import type { MemoWidget } from '@/features/memo/api/memo.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -47,12 +50,20 @@ type VoteWidget = {
   options: string[];
 };
 
+type NoteWidget = {
+  type: 'note';
+  id: string;
+  memoWidgetId?: number;
+  title: string;
+  content: string;
+};
+
 type SimpleWidget = {
-  type: 'question' | 'note' | 'file';
+  type: 'question' | 'file';
   id: string;
 };
 
-type DashboardWidget = QuizWidget | VoteWidget | SimpleWidget;
+type DashboardWidget = QuizWidget | VoteWidget | NoteWidget | SimpleWidget;
 
 interface SortableWidgetProps {
   widget: DashboardWidget;
@@ -101,6 +112,38 @@ function DashBoardPage() {
     null,
   );
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
+  const hasInitializedRef = useRef(false);
+
+  const authToken = localStorage.getItem('authToken') ?? '';
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(
+    lessonCode,
+    authToken,
+  );
+  const memoWidgetIds = useMemo(
+    () => widgetIdsData?.widgets.memo ?? [],
+    [widgetIdsData],
+  );
+  const memoWidgetQueries = useMemoWidgetsQuery(memoWidgetIds, authToken);
+
+  useEffect(() => {
+    if (hasInitializedRef.current) return;
+    if (memoWidgetIds.length === 0) return;
+    if (!memoWidgetQueries.every((query) => query.isSuccess)) return;
+
+    hasInitializedRef.current = true;
+    setWidgets(
+      memoWidgetQueries
+        .map((query) => query.data)
+        .filter((data): data is MemoWidget => data !== undefined)
+        .map((data) => ({
+          type: 'note' as const,
+          id: String(data.id),
+          memoWidgetId: data.id,
+          title: data.title,
+          content: data.content,
+        })),
+    );
+  }, [memoWidgetIds, memoWidgetQueries]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -118,6 +161,13 @@ function DashBoardPage() {
     setIsAddModalOpen(false);
     if (id === 'quiz' || id === 'vote') {
       setActiveCreateModal(id);
+      return;
+    }
+    if (id === 'note') {
+      setWidgets((previous) => [
+        ...previous,
+        { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
+      ]);
       return;
     }
     setWidgets((previous) => [
@@ -219,7 +269,12 @@ function DashBoardPage() {
           />
         );
       case 'note':
-        return <MemoTeacher />;
+        return (
+          <MemoTeacher
+            initialTitle={widget.title}
+            initialMemo={widget.content}
+          />
+        );
       case 'file':
         return (
           <LectureMaterialsTeacher

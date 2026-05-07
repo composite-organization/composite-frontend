@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchLesson,
+  fetchLessonWidgetIds,
   createLesson,
   authenticateLesson,
   type CreateLessonRequest,
@@ -12,6 +13,14 @@ export function useLessonQuery(lessonCode: string, guestToken: string) {
     queryKey: ['lesson', 'detail', lessonCode, guestToken],
     queryFn: () => fetchLesson(lessonCode, guestToken),
     enabled: !!lessonCode && !!guestToken,
+  });
+}
+
+export function useLessonWidgetIdsQuery(lessonCode: string, token: string) {
+  return useQuery({
+    queryKey: ['lesson', 'widgets', lessonCode],
+    queryFn: () => fetchLessonWidgetIds(lessonCode, token),
+    enabled: !!lessonCode && !!token,
   });
 }
 
