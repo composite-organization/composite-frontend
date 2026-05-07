@@ -109,6 +109,7 @@ export default function MainPage() {
         lessonCode: payload.lessonCode,
         password: payload.password,
       });
+      localStorage.setItem('lessonAuthToken', authResponse.token);
       const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
       navigate(
         `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,

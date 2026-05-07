@@ -38,11 +38,11 @@ export async function createLesson(
 
 export async function fetchLesson(
   lessonCode: string,
-  guestToken: string,
+  token: string,
 ): Promise<Lesson> {
   const response = await http.get<Lesson>(`/lessons/${lessonCode}`, {
     headers: {
-      Authorization: `Bearer ${guestToken}`,
+      Authorization: `Bearer ${token}`,
     },
   });
   return response.data;
