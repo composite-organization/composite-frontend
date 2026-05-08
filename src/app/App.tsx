@@ -1,7 +1,26 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import MainPage from '@/page/main/MainPage';
+import DashBoardPage from '@/page/dashboard/DashBoardPage';
 import './App.css';
 
+function AppContent() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainPage />} />
+      <Route
+        path="/dashboard/:lessonCode/:lessonName/:teacherName"
+        element={<DashBoardPage />}
+      />
+    </Routes>
+  );
+}
+
 function App() {
-  return <p>Hello, World!</p>;
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
 }
 
 export default App;

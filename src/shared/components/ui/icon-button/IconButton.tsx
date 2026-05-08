@@ -46,6 +46,7 @@ interface IconButtonProps
   iconName: IconName;
   label?: string;
   labelClassName?: string;
+  iconClassName?: string;
 }
 
 function IconButton({
@@ -55,6 +56,7 @@ function IconButton({
   label,
   className,
   labelClassName,
+  iconClassName,
   ...props
 }: IconButtonProps) {
   return (
@@ -67,7 +69,11 @@ function IconButton({
         className,
       )}
     >
-      <Icon name={iconName} size={iconSizeMap[size ?? 'medium']} />
+      <Icon
+        name={iconName}
+        size={iconSizeMap[size ?? 'medium']}
+        className={iconClassName}
+      />
       {label && (
         <span className={cn('body-medium text-black-500', labelClassName)}>
           {label}
