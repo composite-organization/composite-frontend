@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DashboardHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import { WIDGET_DATA } from '@/features/main/data/widgetData';
 import EntranceSection from '@/features/main/components/ui/entrance-section/EntranceSection';
@@ -10,12 +10,28 @@ import VideoSection from '@/features/main/components/ui/video-section/VideoSecti
 import JoinLessonModal from '@/features/main/components/modal/join-lesson-modal/JoinLessonModal';
 import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/FindLessonModal';
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
+import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
+import {
+  fetchLesson,
+  authenticateLesson,
+} from '@/features/lesson/api/lesson.api';
+import { getGuestToken } from '@/features/guest/api/guest.api';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
 type ModalType = 'join' | 'find' | 'create' | null;
 
+function generateLessonCode(): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < 8; i += 1) {
+    code += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return code;
+}
+
 export default function MainPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedWidgetId, setSelectedWidgetId] =
     useState<SelectedId>('question');
   const [openedModal, setOpenedModal] = useState<ModalType>(null);
@@ -23,6 +39,30 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
+
+  const createLessonMutation = useCreateLessonMutation();
+
+  useEffect(() => {
+    const lessonCodeParam = searchParams.get('lessonCode');
+    if (lessonCodeParam) {
+      setSubmittedJoinCode(lessonCodeParam);
+      setOpenedModal('join');
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (createLessonMutation.isSuccess && createLessonMutation.data) {
+      const lesson = createLessonMutation.data;
+      navigate(
+        `/dashboard/${lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
+    }
+  }, [
+    createLessonMutation.isSuccess,
+    createLessonMutation.data,
+    navigate,
+    lessonCode,
+  ]);
 
   const handleCloseModal = () => {
     setOpenedModal(null);
@@ -36,17 +76,74 @@ export default function MainPage() {
     setOpenedModal('find');
   };
   const handleCreateCode = () => {
-    setLessonCode('ABCD1234');
+    setLessonCode(generateLessonCode());
     setOpenedModal('create');
   };
 
-  const handleCreateSubmit = (payload: {
+  const handleJoinSubmit = async (payload: {
+    studentName: string;
+    lessonCode: string;
+  }) => {
+    try {
+      const guestCredentialsResponse = await getGuestToken({
+        name: payload.studentName,
+      });
+      localStorage.setItem('authToken', guestCredentialsResponse.token);
+      const lesson = await fetchLesson(
+        payload.lessonCode,
+        guestCredentialsResponse.token,
+      );
+      navigate(
+        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
+  };
+
+  const handleFindSubmit = async (payload: {
+    password: string;
+    lessonCode: string;
+  }) => {
+    try {
+      const authResponse = await authenticateLesson({
+        lessonCode: payload.lessonCode,
+        password: payload.password,
+      });
+      localStorage.setItem('lessonAuthToken', authResponse.token);
+      localStorage.setItem('authToken', authResponse.token);
+      const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
+      navigate(
+        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+      );
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
+  };
+
+  const handleCreateSubmit = async (payload: {
     lessonName: string;
     teacherName: string;
     password: string;
     lessonCode: string;
   }) => {
-    navigate(`/dashboard/${payload.lessonName}/${payload.teacherName}`);
+    try {
+      const guestCredentialsResponse = await getGuestToken({
+        name: payload.teacherName,
+      });
+      localStorage.setItem('authToken', guestCredentialsResponse.token);
+      createLessonMutation.mutate({
+        body: {
+          teacherName: payload.teacherName,
+          lessonName: payload.lessonName,
+          lessonCode: payload.lessonCode,
+          password: payload.password,
+        },
+        guestToken: guestCredentialsResponse.token,
+      });
+    } catch {
+      // eslint-disable-next-line no-empty
+    }
   };
 
   return (
@@ -95,6 +192,7 @@ export default function MainPage() {
             lessonCode={submittedJoinCode}
             isOpen
             onClose={handleCloseModal}
+            onSubmit={handleJoinSubmit}
           />
         )}
         {openedModal === 'find' && (
@@ -102,6 +200,7 @@ export default function MainPage() {
             lessonCode={submittedFindCode}
             isOpen
             onClose={handleCloseModal}
+            onSubmit={handleFindSubmit}
           />
         )}
         {openedModal === 'create' && (
@@ -109,6 +208,8 @@ export default function MainPage() {
             isOpen
             onClose={handleCloseModal}
             lessonCode={lessonCode}
+            isLoading={createLessonMutation.isPending}
+            error={createLessonMutation.error?.message || null}
             onSubmit={handleCreateSubmit}
           />
         )}
