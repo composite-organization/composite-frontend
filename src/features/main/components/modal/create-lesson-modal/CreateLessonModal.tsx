@@ -14,6 +14,8 @@ interface CreateLessonModalProps {
   isOpen: boolean;
   onClose: () => void;
   lessonCode: string;
+  isLoading?: boolean;
+  error?: string | null;
   onSubmit?: (payload: {
     lessonName: string;
     teacherName: string;
@@ -26,6 +28,8 @@ function CreateLessonModal({
   isOpen,
   onClose,
   lessonCode,
+  isLoading = false,
+  error = null,
   onSubmit,
 }: CreateLessonModalProps) {
   const lessonNameInput = useFormInput({ validator: validateLessonName });
@@ -116,8 +120,14 @@ function CreateLessonModal({
             수업 코드 분실 시 수업 참여에 어려움이 발생할 수 있습니다!
           </span>
         </div>
-        <Button type="submit" variant="blue" size="xl" disabled={!isValid}>
-          수업 시작하기
+        {error && <span className="label-regular text-red-500">{error}</span>}
+        <Button
+          type="submit"
+          variant="blue"
+          size="xl"
+          disabled={!isValid || isLoading}
+        >
+          {isLoading ? '수업 생성 중...' : '수업 시작하기'}
         </Button>
       </form>
     </Modal>

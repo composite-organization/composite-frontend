@@ -47,7 +47,8 @@ function EntranceForm({
           type="submit"
           shape="square"
           iconName="add"
-          className="h-12 w-[75px] bg-blue-300"
+          className="h-12 w-[75px] bg-blue-300 hover:bg-blue-200"
+          iconClassName="invert"
           disabled={!validateLessonCode(code)}
         />
       </div>
