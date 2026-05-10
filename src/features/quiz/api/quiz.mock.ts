@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
 export const quizHandlers = [
-  http.get('/quizWidgets/:quizWidgetId', ({ params }) => {
+  http.get('*/quizWidgets/:quizWidgetId', ({ params }) => {
     return HttpResponse.json({
       quizWidgetId: Number(params.quizWidgetId),
       title: '제일 웃음이 많은 사람은?',
@@ -50,7 +50,7 @@ export const quizHandlers = [
     });
   }),
 
-  http.post('/quizWidgets', async ({ request }) => {
+  http.post('*/quizWidgets', async ({ request }) => {
     const body = (await request.json()) as Record<string, unknown>;
 
     return HttpResponse.json(
@@ -64,7 +64,7 @@ export const quizHandlers = [
     );
   }),
 
-  http.post('/quizWidgets/:quizWidgetId/submissions', async ({ request }) => {
+  http.post('*/quizWidgets/:quizWidgetId/submissions', async ({ request }) => {
     await request.json();
 
     return new HttpResponse(null, {
@@ -72,7 +72,7 @@ export const quizHandlers = [
     });
   }),
 
-  http.patch('/quizWidgets/:quizWidgetId/status', async ({ request }) => {
+  http.patch('*/quizWidgets/:quizWidgetId/status', async ({ request }) => {
     await request.json();
 
     return new HttpResponse(null, {
@@ -81,7 +81,7 @@ export const quizHandlers = [
   }),
 
   http.patch(
-    '/quizWidgets/:quizWidgetId/quizOptions',
+    '*/quizWidgets/:quizWidgetId/quizOptions',
     async ({ params, request }) => {
       await request.json();
 
@@ -91,13 +91,13 @@ export const quizHandlers = [
     },
   ),
 
-  http.delete('/quizWidgets/:quizWidgetId', () => {
+  http.delete('*/quizWidgets/:quizWidgetId', () => {
     return new HttpResponse(null, {
       status: 200,
     });
   }),
 
-  http.get('/quizWidgets/:quizWidgetId/answers', () => {
+  http.get('*/quizWidgets/:quizWidgetId/answers', () => {
     return HttpResponse.json({
       answerQuizOptionIds: [1],
     });

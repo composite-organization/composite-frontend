@@ -1,45 +1,56 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import {
   createQuizWidget,
-  fetchQuizWidget,
-  submitQuizAnswer,
-  updateQuizStatus,
-  updateQuizOptions,
   deleteQuizWidget,
   fetchQuizAnswers,
-  type User,
+  fetchQuizWidget,
+  submitQuizAnswer,
+  updateQuizOptions,
+  updateQuizStatus,
+  type CreateQuizOptionRequest,
   type CreateQuizWidgetRequest,
   type SubmitQuizRequest,
-  type CreateQuizOptionRequest,
   type UpdateQuizStatusRequest,
 } from './quiz.api';
 
-const useUser = () => ({ id: 0, name: { value: 'tester' } }) as User;
-
-export function useCreateQuizWidgetMutation() {
+export function useCreateQuizWidgetMutation(token: string) {
   const queryClient = useQueryClient();
-  const user = useUser();
 
   return useMutation({
-    mutationFn: (body: CreateQuizWidgetRequest) => createQuizWidget(user, body),
+    mutationFn: (body: CreateQuizWidgetRequest) =>
+      createQuizWidget(token, body),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lesson', 'widgets'] });
       queryClient.invalidateQueries({ queryKey: ['quiz'] });
     },
   });
 }
 
-export function useQuizWidgetQuery(quizWidgetId: number) {
-  const user = useUser();
-
+export function useQuizWidgetQuery(quizWidgetId: number, token: string) {
   return useQuery({
-    queryKey: ['quiz', 'detail', quizWidgetId, user.id],
-    queryFn: () => fetchQuizWidget(quizWidgetId, user),
+    queryKey: ['quiz', 'detail', quizWidgetId],
+    queryFn: () => fetchQuizWidget(quizWidgetId, token),
+    enabled: Number.isFinite(quizWidgetId) && !!token,
   });
 }
 
-export function useSubmitQuizAnswerMutation() {
+export function useQuizWidgetsQuery(quizWidgetIds: number[], token: string) {
+  return useQueries({
+    queries: quizWidgetIds.map((id) => ({
+      queryKey: ['quiz', 'detail', id],
+      queryFn: () => fetchQuizWidget(id, token),
+      enabled: Number.isFinite(id) && !!token,
+    })),
+  });
+}
+
+export function useSubmitQuizAnswerMutation(token: string) {
   const queryClient = useQueryClient();
-  const user = useUser();
 
   return useMutation({
     mutationFn: ({
@@ -48,7 +59,7 @@ export function useSubmitQuizAnswerMutation() {
     }: {
       quizWidgetId: number;
       body: SubmitQuizRequest;
-    }) => submitQuizAnswer(quizWidgetId, user, body),
+    }) => submitQuizAnswer(quizWidgetId, token, body),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -57,9 +68,8 @@ export function useSubmitQuizAnswerMutation() {
   });
 }
 
-export function useUpdateQuizStatusMutation() {
+export function useUpdateQuizStatusMutation(token: string) {
   const queryClient = useQueryClient();
-  const user = useUser();
 
   return useMutation({
     mutationFn: ({
@@ -68,7 +78,7 @@ export function useUpdateQuizStatusMutation() {
     }: {
       quizWidgetId: number;
       body: UpdateQuizStatusRequest;
-    }) => updateQuizStatus(quizWidgetId, user, body),
+    }) => updateQuizStatus(quizWidgetId, token, body),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -77,9 +87,8 @@ export function useUpdateQuizStatusMutation() {
   });
 }
 
-export function useUpdateQuizOptionsMutation() {
+export function useUpdateQuizOptionsMutation(token: string) {
   const queryClient = useQueryClient();
-  const user = useUser();
 
   return useMutation({
     mutationFn: ({
@@ -88,7 +97,7 @@ export function useUpdateQuizOptionsMutation() {
     }: {
       quizWidgetId: number;
       options: CreateQuizOptionRequest[];
-    }) => updateQuizOptions(quizWidgetId, user, { quizWidgetId, options }),
+    }) => updateQuizOptions(quizWidgetId, token, { options }),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -100,13 +109,13 @@ export function useUpdateQuizOptionsMutation() {
   });
 }
 
-export function useDeleteQuizWidgetMutation() {
+export function useDeleteQuizWidgetMutation(token: string) {
   const queryClient = useQueryClient();
-  const user = useUser();
 
   return useMutation({
-    mutationFn: (quizWidgetId: number) => deleteQuizWidget(quizWidgetId, user),
+    mutationFn: (quizWidgetId: number) => deleteQuizWidget(quizWidgetId, token),
     onSuccess: (_data, quizWidgetId) => {
+      queryClient.invalidateQueries({ queryKey: ['lesson', 'widgets'] });
       queryClient.invalidateQueries({ queryKey: ['quiz'] });
       queryClient.removeQueries({ queryKey: ['quiz', 'detail', quizWidgetId] });
       queryClient.removeQueries({
@@ -116,11 +125,24 @@ export function useDeleteQuizWidgetMutation() {
   });
 }
 
-export function useQuizAnswersQuery(quizWidgetId: number) {
-  const user = useUser();
-
+export function useQuizAnswersQuery(quizWidgetId: number, token: string) {
   return useQuery({
     queryKey: ['quiz', 'answers', quizWidgetId],
-    queryFn: () => fetchQuizAnswers(quizWidgetId, user),
+    queryFn: () => fetchQuizAnswers(quizWidgetId, token),
+    enabled: Number.isFinite(quizWidgetId) && !!token,
+  });
+}
+
+export function useQuizAnswersQueries(
+  quizWidgetIds: number[],
+  token: string,
+  enabled = true,
+) {
+  return useQueries({
+    queries: quizWidgetIds.map((id) => ({
+      queryKey: ['quiz', 'answers', id],
+      queryFn: () => fetchQuizAnswers(id, token),
+      enabled: enabled && Number.isFinite(id) && !!token,
+    })),
   });
 }
