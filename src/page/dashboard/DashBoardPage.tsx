@@ -18,9 +18,18 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
-import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
+import {
+  useLessonQuery,
+  useLessonWidgetIdsQuery,
+} from '@/features/lesson/api/lesson.queries';
 import { useMemoWidgetsQuery } from '@/features/memo/api/memo.queries';
+import {
+  useQuizWidgetsQuery,
+  useCreateQuizWidgetMutation,
+  useUpdateQuizStatusMutation,
+} from '@/features/quiz/api/quiz.queries';
 import type { MemoWidget } from '@/features/memo/api/memo.api';
+import type { QuizWidgetDetail } from '@/features/quiz/api/quiz.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -35,6 +44,7 @@ import LectureMaterialsTeacher from '@/features/lecture-materials/ui/LectureMate
 type QuizWidget = {
   type: 'quiz';
   id: string;
+  quizWidgetId?: number;
   question: string;
   choices: string[];
   correctAnswerIndex: number;
@@ -115,35 +125,65 @@ function DashBoardPage() {
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
+  const { data: lessonData } = useLessonQuery(lessonCode, authToken);
+  const storedLessonId = Number(localStorage.getItem('currentLessonId'));
+  const lessonId =
+    lessonData?.id ??
+    (Number.isFinite(storedLessonId) && storedLessonId > 0
+      ? storedLessonId
+      : undefined);
   const { data: widgetIdsData } = useLessonWidgetIdsQuery(
     lessonCode,
     authToken,
   );
+  // 메모 위젯
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
   const memoWidgetQueries = useMemoWidgetsQuery(memoWidgetIds, authToken);
+  // 퀴즈 위젯
+  const quizWidgetIds = useMemo(
+    () => widgetIdsData?.widgets.quiz ?? [],
+    [widgetIdsData],
+  );
+  const quizWidgetQueries = useQuizWidgetsQuery(quizWidgetIds, authToken);
+  const createQuizWidgetMutation = useCreateQuizWidgetMutation(authToken);
+  const updateQuizStatusMutation = useUpdateQuizStatusMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
-    if (memoWidgetIds.length === 0) return;
+    if (memoWidgetIds.length === 0 && quizWidgetIds.length === 0) return;
     if (!memoWidgetQueries.every((query) => query.isSuccess)) return;
+    if (!quizWidgetQueries.every((query) => query.isSuccess)) return;
 
     hasInitializedRef.current = true;
-    setWidgets(
-      memoWidgetQueries
-        .map((query) => query.data)
-        .filter((data): data is MemoWidget => data !== undefined)
-        .map((data) => ({
-          type: 'note' as const,
-          id: String(data.id),
-          memoWidgetId: data.id,
-          title: data.title,
-          content: data.content,
-        })),
-    );
-  }, [memoWidgetIds, memoWidgetQueries]);
+
+    const memoWidgets = memoWidgetQueries
+      .map((query) => query.data)
+      .filter((data): data is MemoWidget => data !== undefined)
+      .map((data) => ({
+        type: 'note' as const,
+        id: String(data.id),
+        memoWidgetId: data.id,
+        title: data.title,
+        content: data.content,
+      }));
+
+    const quizWidgets = quizWidgetQueries
+      .map((query) => query.data)
+      .filter((data): data is QuizWidgetDetail => data !== undefined)
+      .map((data) => ({
+        type: 'quiz' as const,
+        id: String(data.quizWidgetId),
+        quizWidgetId: data.quizWidgetId,
+        question: data.title,
+        choices: data.options.map((option) => option.content),
+        correctAnswerIndex: 0,
+        isEnded: data.status === '종료',
+      }));
+    setWidgets([...memoWidgets, ...quizWidgets]);
+  }, [memoWidgetIds, memoWidgetQueries, quizWidgetIds, quizWidgetQueries]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -181,18 +221,41 @@ function DashBoardPage() {
   }
 
   function handleQuizSubmit(data: QuizCreateData) {
-    setWidgets((previous) => [
-      ...previous,
+    if (!lessonId) {
+      alert('수업 정보를 불러오지 못해 퀴즈를 생성할 수 없습니다.');
+      return;
+    }
+
+    createQuizWidgetMutation.mutate(
       {
-        type: 'quiz',
-        id: crypto.randomUUID(),
-        question: data.question,
-        choices: data.choices,
-        correctAnswerIndex: data.correctAnswerIndex,
-        isEnded: false,
+        lessonId,
+        title: data.question,
+        options: data.choices.map((choice, index) => ({
+          content: choice,
+          isCorrect: index === data.correctAnswerIndex,
+        })),
       },
-    ]);
-    setActiveCreateModal(null);
+      {
+        onSuccess: (createdQuiz) => {
+          setWidgets((previous) => [
+            ...previous,
+            {
+              type: 'quiz',
+              id: String(createdQuiz.quizWidgetId),
+              quizWidgetId: createdQuiz.quizWidgetId,
+              question: data.question,
+              choices: data.choices,
+              correctAnswerIndex: data.correctAnswerIndex,
+              isEnded: false,
+            },
+          ]);
+          setActiveCreateModal(null);
+        },
+        onError: () => {
+          alert('퀴즈 생성에 실패했습니다.');
+        },
+      },
+    );
   }
 
   function handleVoteSubmit(data: {
@@ -218,6 +281,30 @@ function DashBoardPage() {
   }
 
   function handleQuizEnd(widgetId: string) {
+    const target = widgets.find(
+      (widget) => widget.id === widgetId && widget.type === 'quiz',
+    );
+
+    if (!target || target.type !== 'quiz' || !target.quizWidgetId) return;
+
+    updateQuizStatusMutation.mutate(
+      {
+        quizWidgetId: target.quizWidgetId,
+        body: { status: '종료' },
+      },
+      {
+        onSuccess: () => {
+          setWidgets((previous) =>
+            previous.map((widget) =>
+              widget.id === widgetId && widget.type === 'quiz'
+                ? { ...widget, isEnded: true }
+                : widget,
+            ),
+          );
+        },
+      },
+    );
+
     setWidgets((previous) =>
       previous.map((widget) =>
         widget.id === widgetId && widget.type === 'quiz'
