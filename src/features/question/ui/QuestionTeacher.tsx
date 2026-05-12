@@ -1,6 +1,4 @@
-import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
-import IconButton from '@/shared/components/ui/icon-button/IconButton';
-
+import { TeacherWidgetContainer } from '@/shared/components/widget/widget-container/WidgetContainer';
 import QuestionCard from './blocks/QuestionCard';
 import Pagination from './blocks/Pagination';
 
@@ -39,26 +37,13 @@ function QuestionTeacher({
     questions?.slice(startIndex, startIndex + itemsPerPage) ?? [];
 
   return (
-    <section
-      className="flex flex-col w-130"
-      aria-labelledby="teacher-question-title"
+    <TeacherWidgetContainer
+      iconName="question"
+      title={widgetName}
+      description={widgetDescription}
+      width="w-[520px]"
     >
-      <div className="flex flex-row justify-between items-center px-4 py-3 h-[60px] bg-white border border-black-200 rounded-t-[20px]">
-        <div className="flex flex-row items-center gap-3">
-          <WidgetIcon iconName="question" size={36} />
-          <div className="flex flex-col gap-1">
-            <p
-              id="teacher-question-title"
-              className="body-medium text-black-500"
-            >
-              {widgetName}
-            </p>
-            <p className="label-regular text-black-200">{widgetDescription}</p>
-          </div>
-        </div>
-        <IconButton iconName="more" shape="square" aria-label="메뉴 열기" />
-      </div>
-      <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2 bg-black-0 border-x border-b border-black-200 rounded-b-[20px] w-[520px]">
+      <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2">
         {questions.length === 0 ? (
           <p className="w-full text-center py-4 body-regular text-black-200">
             등록된 질문이 없습니다
@@ -82,7 +67,7 @@ function QuestionTeacher({
           </div>
         )}
       </div>
-    </section>
+    </TeacherWidgetContainer>
   );
 }
 
