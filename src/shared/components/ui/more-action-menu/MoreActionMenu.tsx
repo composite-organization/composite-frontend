@@ -1,4 +1,6 @@
 import { cn } from '@/lib/utils';
+import ActionButton from '@/shared/components/ui/action-button/ActionButton';
+import Icon, { type IconName } from '@/shared/components/ui/icon/Icon';
 
 interface MoreActionMenuProps {
   className?: string;
@@ -7,49 +9,22 @@ interface MoreActionMenuProps {
 }
 
 interface ActionItemProps {
-  iconName: 'edit' | 'delete';
+  variant: 'edit' | 'delete';
+  iconName: IconName;
   label: string;
-  colorClassName: string;
-  iconColor: string;
   onClick?: () => void;
 }
 
-function ActionIcon({
-  iconName,
-  iconColor,
-}: Pick<ActionItemProps, 'iconName' | 'iconColor'>) {
+function ActionItem({ variant, iconName, label, onClick }: ActionItemProps) {
   return (
-    <span
-      aria-hidden
-      className="size-4 shrink-0"
-      style={{
-        backgroundColor: iconColor,
-        mask: `url(/assets/icons/${iconName}.svg) center / contain no-repeat`,
-        WebkitMask: `url(/assets/icons/${iconName}.svg) center / contain no-repeat`,
-      }}
-    />
-  );
-}
-
-function ActionItem({
-  iconName,
-  label,
-  colorClassName,
-  iconColor,
-  onClick,
-}: ActionItemProps) {
-  return (
-    <button
-      type="button"
-      className={cn(
-        'flex h-9 w-full items-center gap-2 rounded-lg px-3 text-left label-medium transition-colors hover:bg-black-50',
-        colorClassName,
-      )}
+    <ActionButton
+      variant={variant}
+      className="h-9 w-full justify-start gap-2 px-3 label-medium hover:bg-black-50"
       onClick={onClick}
     >
-      <ActionIcon iconName={iconName} iconColor={iconColor} />
+      <Icon name={iconName} size={16} decorative className="size-4 shrink-0" />
       <span>{label}</span>
-    </button>
+    </ActionButton>
   );
 }
 
@@ -67,17 +42,15 @@ function MoreActionMenu({
       role="menu"
     >
       <ActionItem
+        variant="edit"
         iconName="edit"
         label="수정"
-        colorClassName="text-black-500"
-        iconColor="#1E1E1E"
         onClick={onEditClick}
       />
       <ActionItem
+        variant="delete"
         iconName="delete"
         label="삭제"
-        colorClassName="text-[#FF0000]"
-        iconColor="#FF0000"
         onClick={onDeleteClick}
       />
     </div>

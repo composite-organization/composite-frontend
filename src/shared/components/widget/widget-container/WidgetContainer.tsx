@@ -98,9 +98,6 @@ export function StudentWidgetContainer(props: StudentWidgetContainerProps) {
   return <WidgetContainerBase {...props} />;
 }
 
-function WidgetContainer(props: TeacherWidgetContainerProps) {
+export function TeacherWidgetContainer(props: TeacherWidgetContainerProps) {
   return <WidgetContainerBase {...props} showMore />;
 }
-
-export { WidgetContainer as TeacherWidgetContainer };
-export default WidgetContainer;
