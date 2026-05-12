@@ -41,10 +41,10 @@ export function useQuizWidgetQuery(quizWidgetId: number, token: string) {
 
 export function useQuizWidgetsQuery(quizWidgetIds: number[], token: string) {
   return useQueries({
-    queries: quizWidgetIds.map((id) => ({
-      queryKey: ['quiz', 'detail', id],
-      queryFn: () => fetchQuizWidget(id, token),
-      enabled: Number.isFinite(id) && !!token,
+    queries: quizWidgetIds.map((quizWidgetId) => ({
+      queryKey: ['quiz', 'detail', quizWidgetId],
+      queryFn: () => fetchQuizWidget(quizWidgetId, token),
+      enabled: Number.isFinite(quizWidgetId) && !!token,
     })),
   });
 }
@@ -139,10 +139,10 @@ export function useQuizAnswersQueries(
   enabled = true,
 ) {
   return useQueries({
-    queries: quizWidgetIds.map((id) => ({
-      queryKey: ['quiz', 'answers', id],
-      queryFn: () => fetchQuizAnswers(id, token),
-      enabled: enabled && Number.isFinite(id) && !!token,
+    queries: quizWidgetIds.map((quizWidgetId) => ({
+      queryKey: ['quiz', 'answers', quizWidgetId],
+      queryFn: () => fetchQuizAnswers(quizWidgetId, token),
+      enabled: enabled && Number.isFinite(quizWidgetId) && !!token,
     })),
   });
 }
