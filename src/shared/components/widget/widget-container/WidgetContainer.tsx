@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
+import MoreActionMenu from '@/shared/components/ui/more-action-menu/MoreActionMenu';
 import type { WidgetName } from '@/shared/types/widget.type';
 
 interface WidgetContainerBaseProps {
@@ -10,7 +11,8 @@ interface WidgetContainerBaseProps {
   width?: string;
   children: ReactNode;
   showMore?: boolean;
-  onMoreClick?: () => void;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 }
 
 interface StudentWidgetContainerProps {
@@ -27,7 +29,8 @@ interface TeacherWidgetContainerProps {
   description: string;
   width?: string;
   children: ReactNode;
-  onMoreClick?: () => void;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
 }
 
 function WidgetContainerBase({
@@ -37,8 +40,25 @@ function WidgetContainerBase({
   width = 'w-130',
   children,
   showMore = false,
-  onMoreClick,
+  onEditClick,
+  onDeleteClick,
 }: WidgetContainerBaseProps) {
+  const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+
+  function handleMoreClick() {
+    setIsActionMenuOpen((previous) => !previous);
+  }
+
+  function handleEditClick() {
+    onEditClick?.();
+    setIsActionMenuOpen(false);
+  }
+
+  function handleDeleteClick() {
+    onDeleteClick?.();
+    setIsActionMenuOpen(false);
+  }
+
   return (
     <div className={`flex flex-col ${width}`}>
       <div className="flex flex-row items-center justify-between px-4 py-3 bg-white border border-black-200 rounded-t-[20px]">
@@ -50,7 +70,20 @@ function WidgetContainerBase({
           </div>
         </div>
         {showMore && (
-          <IconButton iconName="more" shape="square" onClick={onMoreClick} />
+          <div className="relative">
+            <IconButton
+              iconName="more"
+              shape="square"
+              onClick={handleMoreClick}
+              aria-label="위젯 옵션 열기"
+            />
+            {isActionMenuOpen && (
+              <MoreActionMenu
+                onEditClick={handleEditClick}
+                onDeleteClick={handleDeleteClick}
+              />
+            )}
+          </div>
         )}
       </div>
 
