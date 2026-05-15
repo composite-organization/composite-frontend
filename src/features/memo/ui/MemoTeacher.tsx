@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
-import IconButton from '@/shared/components/ui/icon-button/IconButton';
+import { TeacherWidgetContainer } from '@/shared/components/widget/widget-container/WidgetContainer';
 import MemoItem from '@/features/memo/ui/blocks/MemoItem';
 
 interface MemoTeacherProps {
@@ -20,20 +19,13 @@ function MemoTeacher({
   const [memo, setMemo] = useState(initialMemo);
 
   return (
-    <div className="flex flex-col w-[520px]">
-      <div className="flex flex-row justify-between items-center px-4 py-3 h-[60px] bg-white border border-black-200 rounded-t-[20px]">
-        <div className="flex flex-row items-center gap-3">
-          <WidgetIcon iconName="note" size={36} />
-          <div className="flex flex-col gap-1">
-            <span className="body-medium text-black-500">{widgetName}</span>
-            <span className="label-regular text-black-200">
-              {widgetDescription}
-            </span>
-          </div>
-        </div>
-        <IconButton iconName="more" shape="square" />
-      </div>
-      <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2 bg-black-0 border-x border-b border-black-200 rounded-b-[20px] w-[520px]">
+    <TeacherWidgetContainer
+      iconName="note"
+      title={widgetName}
+      description={widgetDescription}
+      width="w-[520px]"
+    >
+      <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2">
         <MemoItem
           title={title}
           memo={memo}
@@ -42,7 +34,7 @@ function MemoTeacher({
           onMemoChange={setMemo}
         />
       </div>
-    </div>
+    </TeacherWidgetContainer>
   );
 }
 
