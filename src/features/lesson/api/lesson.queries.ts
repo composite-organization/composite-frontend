@@ -11,7 +11,7 @@ import {
 export function useLessonQuery(lessonCode: string, guestToken: string) {
   return useQuery({
     queryKey: ['lesson', 'detail', lessonCode, guestToken],
-    queryFn: () => fetchLesson(lessonCode, guestToken),
+    queryFn: () => fetchLesson(lessonCode),
     enabled: !!lessonCode && !!guestToken,
   });
 }
@@ -19,7 +19,7 @@ export function useLessonQuery(lessonCode: string, guestToken: string) {
 export function useLessonWidgetIdsQuery(lessonCode: string, token: string) {
   return useQuery({
     queryKey: ['lesson', 'widgets', lessonCode],
-    queryFn: () => fetchLessonWidgetIds(lessonCode, token),
+    queryFn: () => fetchLessonWidgetIds(lessonCode),
     enabled: !!lessonCode && !!token,
   });
 }
@@ -27,13 +27,7 @@ export function useLessonWidgetIdsQuery(lessonCode: string, token: string) {
 export function useCreateLessonMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      body,
-      guestToken,
-    }: {
-      body: CreateLessonRequest;
-      guestToken: string;
-    }) => createLesson(body, guestToken),
+    mutationFn: ({ body }: { body: CreateLessonRequest }) => createLesson(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lesson'] });
     },

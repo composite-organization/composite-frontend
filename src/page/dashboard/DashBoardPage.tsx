@@ -30,6 +30,7 @@ import {
 } from '@/features/quiz/api/quiz.queries';
 import type { MemoWidget } from '@/features/memo/api/memo.api';
 import type { QuizWidgetDetail } from '@/features/quiz/api/quiz.api';
+import { getCurrentLessonId } from '@/lib/lessonStorage';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -126,12 +127,7 @@ function DashBoardPage() {
 
   const authToken = localStorage.getItem('authToken') ?? '';
   const { data: lessonData } = useLessonQuery(lessonCode, authToken);
-  const storedLessonId = Number(localStorage.getItem('currentLessonId'));
-  const lessonId =
-    lessonData?.id ??
-    (Number.isFinite(storedLessonId) && storedLessonId > 0
-      ? storedLessonId
-      : undefined);
+  const lessonId = lessonData?.lessonId ?? getCurrentLessonId();
   const { data: widgetIdsData } = useLessonWidgetIdsQuery(
     lessonCode,
     authToken,
@@ -148,8 +144,8 @@ function DashBoardPage() {
     [widgetIdsData],
   );
   const quizWidgetQueries = useQuizWidgetsQuery(quizWidgetIds, authToken);
-  const createQuizWidgetMutation = useCreateQuizWidgetMutation(authToken);
-  const updateQuizStatusMutation = useUpdateQuizStatusMutation(authToken);
+  const createQuizWidgetMutation = useCreateQuizWidgetMutation();
+  const updateQuizStatusMutation = useUpdateQuizStatusMutation();
 
   useEffect(() => {
     if (hasInitializedRef.current) return;

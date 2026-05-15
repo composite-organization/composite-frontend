@@ -1,7 +1,7 @@
 import { http } from '../../../lib/http';
 
 export interface Lesson {
-  id: number;
+  lessonId: number;
   teacherName: string;
   lessonName: string;
   lessonCode: string;
@@ -24,27 +24,13 @@ export interface AuthenticateLessonResponse {
   token: string;
 }
 
-export async function createLesson(
-  body: CreateLessonRequest,
-  guestToken: string,
-): Promise<Lesson> {
-  const response = await http.post<Lesson>('/lessons', body, {
-    headers: {
-      Authorization: `Bearer ${guestToken}`,
-    },
-  });
+export async function createLesson(body: CreateLessonRequest): Promise<Lesson> {
+  const response = await http.post<Lesson>('/lessons', body);
   return response.data;
 }
 
-export async function fetchLesson(
-  lessonCode: string,
-  token: string,
-): Promise<Lesson> {
-  const response = await http.get<Lesson>(`/lessons/${lessonCode}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function fetchLesson(lessonCode: string): Promise<Lesson> {
+  const response = await http.get<Lesson>(`/lessons/${lessonCode}`);
   return response.data;
 }
 
@@ -61,15 +47,9 @@ export interface GetLessonWidgetIdsResponse {
 
 export async function fetchLessonWidgetIds(
   lessonCode: string,
-  token: string,
 ): Promise<GetLessonWidgetIdsResponse> {
   const response = await http.get<GetLessonWidgetIdsResponse>(
     `/lessons/${lessonCode}/widgets`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
   );
   return response.data;
 }

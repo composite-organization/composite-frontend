@@ -18,12 +18,11 @@ import {
   type UpdateQuizStatusRequest,
 } from './quiz.api';
 
-export function useCreateQuizWidgetMutation(token: string) {
+export function useCreateQuizWidgetMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: CreateQuizWidgetRequest) =>
-      createQuizWidget(token, body),
+    mutationFn: (body: CreateQuizWidgetRequest) => createQuizWidget(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lesson', 'widgets'] });
       queryClient.invalidateQueries({ queryKey: ['quiz'] });
@@ -34,7 +33,7 @@ export function useCreateQuizWidgetMutation(token: string) {
 export function useQuizWidgetQuery(quizWidgetId: number, token: string) {
   return useQuery({
     queryKey: ['quiz', 'detail', quizWidgetId],
-    queryFn: () => fetchQuizWidget(quizWidgetId, token),
+    queryFn: () => fetchQuizWidget(quizWidgetId),
     enabled: Number.isFinite(quizWidgetId) && !!token,
   });
 }
@@ -43,13 +42,13 @@ export function useQuizWidgetsQuery(quizWidgetIds: number[], token: string) {
   return useQueries({
     queries: quizWidgetIds.map((quizWidgetId) => ({
       queryKey: ['quiz', 'detail', quizWidgetId],
-      queryFn: () => fetchQuizWidget(quizWidgetId, token),
+      queryFn: () => fetchQuizWidget(quizWidgetId),
       enabled: Number.isFinite(quizWidgetId) && !!token,
     })),
   });
 }
 
-export function useSubmitQuizAnswerMutation(token: string) {
+export function useSubmitQuizAnswerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -59,7 +58,7 @@ export function useSubmitQuizAnswerMutation(token: string) {
     }: {
       quizWidgetId: number;
       body: SubmitQuizRequest;
-    }) => submitQuizAnswer(quizWidgetId, token, body),
+    }) => submitQuizAnswer(quizWidgetId, body),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -68,7 +67,7 @@ export function useSubmitQuizAnswerMutation(token: string) {
   });
 }
 
-export function useUpdateQuizStatusMutation(token: string) {
+export function useUpdateQuizStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -78,7 +77,7 @@ export function useUpdateQuizStatusMutation(token: string) {
     }: {
       quizWidgetId: number;
       body: UpdateQuizStatusRequest;
-    }) => updateQuizStatus(quizWidgetId, token, body),
+    }) => updateQuizStatus(quizWidgetId, body),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -87,7 +86,7 @@ export function useUpdateQuizStatusMutation(token: string) {
   });
 }
 
-export function useUpdateQuizOptionsMutation(token: string) {
+export function useUpdateQuizOptionsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,7 +96,7 @@ export function useUpdateQuizOptionsMutation(token: string) {
     }: {
       quizWidgetId: number;
       options: CreateQuizOptionRequest[];
-    }) => updateQuizOptions(quizWidgetId, token, { options }),
+    }) => updateQuizOptions(quizWidgetId, { options }),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -109,11 +108,11 @@ export function useUpdateQuizOptionsMutation(token: string) {
   });
 }
 
-export function useDeleteQuizWidgetMutation(token: string) {
+export function useDeleteQuizWidgetMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (quizWidgetId: number) => deleteQuizWidget(quizWidgetId, token),
+    mutationFn: (quizWidgetId: number) => deleteQuizWidget(quizWidgetId),
     onSuccess: (_data, quizWidgetId) => {
       queryClient.invalidateQueries({ queryKey: ['lesson', 'widgets'] });
       queryClient.invalidateQueries({ queryKey: ['quiz'] });
@@ -128,7 +127,7 @@ export function useDeleteQuizWidgetMutation(token: string) {
 export function useQuizAnswersQuery(quizWidgetId: number, token: string) {
   return useQuery({
     queryKey: ['quiz', 'answers', quizWidgetId],
-    queryFn: () => fetchQuizAnswers(quizWidgetId, token),
+    queryFn: () => fetchQuizAnswers(quizWidgetId),
     enabled: Number.isFinite(quizWidgetId) && !!token,
   });
 }
@@ -141,7 +140,7 @@ export function useQuizAnswersQueries(
   return useQueries({
     queries: quizWidgetIds.map((quizWidgetId) => ({
       queryKey: ['quiz', 'answers', quizWidgetId],
-      queryFn: () => fetchQuizAnswers(quizWidgetId, token),
+      queryFn: () => fetchQuizAnswers(quizWidgetId),
       enabled: enabled && Number.isFinite(quizWidgetId) && !!token,
     })),
   });
