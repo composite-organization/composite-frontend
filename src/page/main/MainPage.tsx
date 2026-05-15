@@ -39,6 +39,7 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
+  const [teacherName, setTeacherName] = useState<string>('');
 
   const createLessonMutation = useCreateLessonMutation();
 
@@ -53,15 +54,14 @@ export default function MainPage() {
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
-      navigate(
-        `/dashboard/${lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
-      );
+      navigate(`/dashboard/${lessonCode}/${lesson.lessonName}/${teacherName}`);
     }
   }, [
     createLessonMutation.isSuccess,
     createLessonMutation.data,
     navigate,
     lessonCode,
+    teacherName,
   ]);
 
   const handleCloseModal = () => {
@@ -141,6 +141,7 @@ export default function MainPage() {
         },
         guestToken: guestCredentialsResponse.token,
       });
+      setTeacherName(payload.teacherName);
     } catch {
       // eslint-disable-next-line no-empty
     }
