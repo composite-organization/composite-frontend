@@ -18,9 +18,12 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
-import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
-import { useMemoWidgetsQuery } from '@/features/memo/api/memo.queries';
-import type { MemoWidget } from '@/features/memo/api/memo.api';
+import {
+  useLessonWidgetIdsQuery,
+  useLessonQuery,
+} from '@/features/lesson/api/lesson.queries';
+import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
+import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -115,6 +118,7 @@ function DashBoardPage() {
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
+  const { data: lessonData } = useLessonQuery(lessonCode, authToken);
   const { data: widgetIdsData } = useLessonWidgetIdsQuery(
     lessonCode,
     authToken,
@@ -123,27 +127,35 @@ function DashBoardPage() {
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
-  const memoWidgetQueries = useMemoWidgetsQuery(memoWidgetIds, authToken);
+  const createMemoMutation = useCreateMemoWidgetMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
     if (memoWidgetIds.length === 0) return;
-    if (!memoWidgetQueries.every((query) => query.isSuccess)) return;
+    if (!authToken) return;
 
-    hasInitializedRef.current = true;
-    setWidgets(
-      memoWidgetQueries
-        .map((query) => query.data)
-        .filter((data): data is MemoWidget => data !== undefined)
-        .map((data) => ({
-          type: 'note' as const,
-          id: String(data.id),
-          memoWidgetId: data.id,
-          title: data.title,
-          content: data.content,
-        })),
-    );
-  }, [memoWidgetIds, memoWidgetQueries]);
+    const loadMemoWidgets = async () => {
+      try {
+        const memoWidgetDataArray = await Promise.all(
+          memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
+        );
+        setWidgets(
+          memoWidgetDataArray.map((data) => ({
+            type: 'note' as const,
+            id: String(data.id),
+            memoWidgetId: data.id,
+            title: data.title,
+            content: data.content,
+          })),
+        );
+        hasInitializedRef.current = true;
+      } catch {
+        hasInitializedRef.current = true;
+      }
+    };
+
+    loadMemoWidgets();
+  }, [memoWidgetIds, authToken]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -157,17 +169,36 @@ function DashBoardPage() {
     setIsAddModalOpen(false);
   }
 
-  function handleSelectWidget(id: WidgetName) {
+  async function handleSelectWidget(id: WidgetName) {
     setIsAddModalOpen(false);
     if (id === 'quiz' || id === 'vote') {
       setActiveCreateModal(id);
       return;
     }
     if (id === 'note') {
-      setWidgets((previous) => [
-        ...previous,
-        { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
-      ]);
+      if (!lessonData?.id) return;
+      try {
+        const createdMemo = await createMemoMutation.mutateAsync({
+          lessonId: lessonData.id,
+          title: '',
+          content: '',
+        });
+        setWidgets((previous) => [
+          ...previous,
+          {
+            type: 'note',
+            id: String(createdMemo.id),
+            memoWidgetId: createdMemo.id,
+            title: '',
+            content: '',
+          },
+        ]);
+      } catch {
+        setWidgets((previous) => [
+          ...previous,
+          { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
+        ]);
+      }
       return;
     }
     setWidgets((previous) => [
@@ -271,6 +302,7 @@ function DashBoardPage() {
       case 'note':
         return (
           <MemoTeacher
+            memoWidgetId={widget.memoWidgetId}
             initialTitle={widget.title}
             initialMemo={widget.content}
           />

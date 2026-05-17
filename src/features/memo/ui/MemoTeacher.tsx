@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WidgetIcon from '@/shared/components/ui/widget-icon/WidgetIcon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import MemoItem from '@/features/memo/ui/blocks/MemoItem';
+import { useUpdateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 
 interface MemoTeacherProps {
+  memoWidgetId?: number;
   widgetName?: string;
   widgetDescription?: string;
   initialTitle?: string;
@@ -13,6 +15,7 @@ interface MemoTeacherProps {
 }
 
 function MemoTeacher({
+  memoWidgetId,
   widgetName = '메모장',
   widgetDescription = '위젯 설명',
   initialTitle = '',
@@ -22,6 +25,27 @@ function MemoTeacher({
 }: MemoTeacherProps) {
   const [title, setTitle] = useState(initialTitle);
   const [memo, setMemo] = useState(initialMemo);
+  const authToken = localStorage.getItem('authToken') ?? '';
+
+  const updateMemoMutation = useUpdateMemoWidgetMutation(authToken);
+
+  useEffect(() => {
+    if (!memoWidgetId) return;
+
+    const saveMemo = () => {
+      updateMemoMutation.mutate({
+        memoWidgetId,
+        body: {
+          title,
+          content: memo,
+        },
+      });
+    };
+
+    const timer = setTimeout(saveMemo, 1000);
+    // eslint-disable-next-line consistent-return
+    return () => clearTimeout(timer);
+  }, [title, memo, memoWidgetId, updateMemoMutation]);
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
