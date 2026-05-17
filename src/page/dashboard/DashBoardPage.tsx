@@ -305,10 +305,14 @@ function DashBoardPage() {
             onPageChange={() => {}}
           />
         );
-      case 'note':
+      case 'note': {
+        const numericMemoWidgetId =
+          typeof widget.memoWidgetId === 'number'
+            ? widget.memoWidgetId
+            : undefined;
         return (
           <MemoTeacher
-            memoWidgetId={widget.memoWidgetId}
+            memoWidgetId={numericMemoWidgetId}
             lessonId={lessonData?.id}
             initialTitle={widget.title}
             initialMemo={widget.content}
@@ -321,6 +325,7 @@ function DashBoardPage() {
             }}
           />
         );
+      }
       case 'file':
         return (
           <LectureMaterialsTeacher
