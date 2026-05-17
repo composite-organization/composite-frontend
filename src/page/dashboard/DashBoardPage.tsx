@@ -176,9 +176,16 @@ function DashBoardPage() {
       return;
     }
     if (id === 'note') {
+      if (!lessonData?.id) {
+        setWidgets((previous) => [
+          ...previous,
+          { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
+        ]);
+        return;
+      }
       try {
         const createdMemo = await createMemoMutation.mutateAsync({
-          lessonId: lessonData?.id ?? 0,
+          lessonId: lessonData.id,
           title: '',
           content: '',
         });
