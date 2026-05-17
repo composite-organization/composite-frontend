@@ -176,10 +176,9 @@ function DashBoardPage() {
       return;
     }
     if (id === 'note') {
-      if (!lessonData?.id) return;
       try {
         const createdMemo = await createMemoMutation.mutateAsync({
-          lessonId: lessonData.id,
+          lessonId: lessonData?.id ?? 0,
           title: '',
           content: '',
         });
