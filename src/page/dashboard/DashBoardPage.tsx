@@ -29,6 +29,7 @@ import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardH
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
 import QuizCreate, { type QuizCreateData } from '@/features/quiz/ui/QuizCreate';
 import VoteCreate from '@/features/vote/ui/VoteCreate';
+import MemoCreate, { type MemoCreateData } from '@/features/memo/ui/MemoCreate';
 import QuizTeacher from '@/features/quiz/ui/QuizTeacher';
 import VoteTeacher from '@/features/vote/ui/VoteTeacher';
 import QuestionTeacher from '@/features/question/ui/QuestionTeacher';
@@ -114,6 +115,7 @@ function DashBoardPage() {
   const [activeCreateModal, setActiveCreateModal] = useState<WidgetName | null>(
     null,
   );
+  const [isMemoCreateOpen, setIsMemoCreateOpen] = useState(false);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const hasInitializedRef = useRef(false);
 
@@ -169,42 +171,14 @@ function DashBoardPage() {
     setIsAddModalOpen(false);
   }
 
-  async function handleSelectWidget(id: WidgetName) {
+  function handleSelectWidget(id: WidgetName) {
     setIsAddModalOpen(false);
     if (id === 'quiz' || id === 'vote') {
       setActiveCreateModal(id);
       return;
     }
     if (id === 'note') {
-      if (!lessonData?.id) {
-        setWidgets((previous) => [
-          ...previous,
-          { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
-        ]);
-        return;
-      }
-      try {
-        const createdMemo = await createMemoMutation.mutateAsync({
-          lessonId: lessonData.id,
-          title: '',
-          content: '',
-        });
-        setWidgets((previous) => [
-          ...previous,
-          {
-            type: 'note',
-            id: String(createdMemo.id),
-            memoWidgetId: createdMemo.id,
-            title: '',
-            content: '',
-          },
-        ]);
-      } catch {
-        setWidgets((previous) => [
-          ...previous,
-          { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
-        ]);
-      }
+      setIsMemoCreateOpen(true);
       return;
     }
     setWidgets((previous) => [
@@ -215,6 +189,36 @@ function DashBoardPage() {
 
   function handleCloseCreateModal() {
     setActiveCreateModal(null);
+  }
+
+  function handleCloseMemoCreateModal() {
+    setIsMemoCreateOpen(false);
+  }
+
+  function handleMemoSubmit(data: MemoCreateData) {
+    if (!lessonData?.id) return;
+    createMemoMutation.mutate(
+      {
+        lessonId: lessonData.id,
+        title: data.title,
+        content: data.content,
+      },
+      {
+        onSuccess: (createdMemo) => {
+          setWidgets((previous) => [
+            ...previous,
+            {
+              type: 'note',
+              id: String(createdMemo.id),
+              memoWidgetId: createdMemo.id,
+              title: createdMemo.title,
+              content: createdMemo.content,
+            },
+          ]);
+          setIsMemoCreateOpen(false);
+        },
+      },
+    );
   }
 
   function handleQuizSubmit(data: QuizCreateData) {
@@ -305,27 +309,8 @@ function DashBoardPage() {
             onPageChange={() => {}}
           />
         );
-      case 'note': {
-        const numericMemoWidgetId =
-          typeof widget.memoWidgetId === 'number'
-            ? widget.memoWidgetId
-            : undefined;
-        return (
-          <MemoTeacher
-            memoWidgetId={numericMemoWidgetId}
-            lessonId={lessonData?.id}
-            initialTitle={widget.title}
-            initialMemo={widget.content}
-            onMemoWidgetIdChange={(id) => {
-              setWidgets((previous) =>
-                previous.map((w) =>
-                  w.id === widget.id ? { ...w, memoWidgetId: id } : w,
-                ),
-              );
-            }}
-          />
-        );
-      }
+      case 'note':
+        return <MemoTeacher title={widget.title} content={widget.content} />;
       case 'file':
         return (
           <LectureMaterialsTeacher
@@ -388,6 +373,11 @@ function DashBoardPage() {
         isOpen={activeCreateModal === 'vote'}
         onCancel={handleCloseCreateModal}
         onSubmit={handleVoteSubmit}
+      />
+      <MemoCreate
+        isOpen={isMemoCreateOpen}
+        onClose={handleCloseMemoCreateModal}
+        onSubmit={handleMemoSubmit}
       />
     </div>
   );
