@@ -309,8 +309,16 @@ function DashBoardPage() {
         return (
           <MemoTeacher
             memoWidgetId={widget.memoWidgetId}
+            lessonId={lessonData?.id}
             initialTitle={widget.title}
             initialMemo={widget.content}
+            onMemoWidgetIdChange={(id) => {
+              setWidgets((previous) =>
+                previous.map((w) =>
+                  w.id === widget.id ? { ...w, memoWidgetId: id } : w,
+                ),
+              );
+            }}
           />
         );
       case 'file':
