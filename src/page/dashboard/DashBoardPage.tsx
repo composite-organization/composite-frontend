@@ -18,10 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
-import {
-  useLessonWidgetIdsQuery,
-  useLessonQuery,
-} from '@/features/lesson/api/lesson.queries';
+import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
@@ -104,13 +101,16 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
 function DashBoardPage() {
   const {
     lessonCode = '',
+    lessonId: lessonIdParam = '',
     lessonName = '',
     teacherName = '',
   } = useParams<{
     lessonCode: string;
+    lessonId: string;
     lessonName: string;
     teacherName: string;
   }>();
+  const lessonId = Number(lessonIdParam);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeCreateModal, setActiveCreateModal] = useState<WidgetName | null>(
     null,
@@ -120,11 +120,7 @@ function DashBoardPage() {
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
-  const { data: lessonData } = useLessonQuery(lessonCode, authToken);
-  const { data: widgetIdsData } = useLessonWidgetIdsQuery(
-    lessonCode,
-    authToken,
-  );
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
@@ -196,10 +192,10 @@ function DashBoardPage() {
   }
 
   function handleMemoSubmit(data: MemoCreateData) {
-    if (!lessonData?.id) return;
+    if (!lessonId) return;
     createMemoMutation.mutate(
       {
-        lessonId: lessonData.id,
+        lessonId,
         title: data.title,
         content: data.content,
       },

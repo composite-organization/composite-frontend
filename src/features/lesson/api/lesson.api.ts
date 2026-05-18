@@ -1,11 +1,9 @@
 import { http } from '../../../lib/http';
 
 export interface Lesson {
-  id: number;
-  teacherName: string;
+  lessonId: number;
   lessonName: string;
-  lessonCode: string;
-  createdTime: string;
+  teacherName: string;
 }
 
 export interface CreateLessonRequest {
@@ -15,6 +13,19 @@ export interface CreateLessonRequest {
   password: string;
 }
 
+export interface CreateLessonResponse {
+  lessonId: number;
+  lessonName: string;
+}
+
+export interface JoinStudentRequest {
+  name: string;
+}
+
+export interface JoinStudentResponse {
+  lessonId: number;
+}
+
 export interface AuthenticateLessonRequest {
   lessonCode: string;
   password: string;
@@ -22,13 +33,14 @@ export interface AuthenticateLessonRequest {
 
 export interface AuthenticateLessonResponse {
   token: string;
+  lessonId: number;
 }
 
 export async function createLesson(
   body: CreateLessonRequest,
   guestToken: string,
-): Promise<Lesson> {
-  const response = await http.post<Lesson>('/lessons', body, {
+): Promise<CreateLessonResponse> {
+  const response = await http.post<CreateLessonResponse>('/lessons', body, {
     headers: {
       Authorization: `Bearer ${guestToken}`,
     },
@@ -36,11 +48,28 @@ export async function createLesson(
   return response.data;
 }
 
-export async function fetchLesson(
+export async function joinLessonAsStudent(
   lessonCode: string,
+  body: JoinStudentRequest,
+  token: string,
+): Promise<JoinStudentResponse> {
+  const response = await http.post<JoinStudentResponse>(
+    `/lessons/${lessonCode}/students`,
+    body,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return response.data;
+}
+
+export async function fetchLesson(
+  lessonId: number,
   token: string,
 ): Promise<Lesson> {
-  const response = await http.get<Lesson>(`/lessons/${lessonCode}`, {
+  const response = await http.get<Lesson>(`/lessons/${lessonId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -60,11 +89,11 @@ export interface GetLessonWidgetIdsResponse {
 }
 
 export async function fetchLessonWidgetIds(
-  lessonCode: string,
+  lessonId: number,
   token: string,
 ): Promise<GetLessonWidgetIdsResponse> {
   const response = await http.get<GetLessonWidgetIdsResponse>(
-    `/lessons/${lessonCode}/widgets`,
+    `/lessons/${lessonId}/widgets`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -77,12 +106,15 @@ export async function fetchLessonWidgetIds(
 export async function authenticateLesson(
   body: AuthenticateLessonRequest,
 ): Promise<AuthenticateLessonResponse> {
-  const response = await http.post('/lessons/authentications', body);
+  const response = await http.post<{ lessonId: number }>(
+    '/lessons/authentications',
+    body,
+  );
   const authorizationHeader: string =
     response.headers.authorization || response.headers.Authorization;
   if (!authorizationHeader) throw new Error('Authorization header not found');
   const token = authorizationHeader.startsWith('Bearer ')
     ? authorizationHeader.slice(7)
     : authorizationHeader;
-  return { token };
+  return { token, lessonId: response.data.lessonId };
 }
