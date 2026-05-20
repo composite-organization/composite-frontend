@@ -62,6 +62,7 @@ function QuizTeacher({
         title="퀴즈"
         description="퀴즈 위젯"
         onDeleteClick={onDelete}
+        isEditDisabled={isEnded}
         onEditClick={onEdit}
       >
         <div className="flex flex-col gap-5 px-4 pt-4 pb-5">

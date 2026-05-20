@@ -4,6 +4,7 @@ import Icon, { type IconName } from '@/shared/components/ui/icon/Icon';
 
 interface MoreActionMenuProps {
   className?: string;
+  isEditDisabled?: boolean;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -12,14 +13,22 @@ interface ActionItemProps {
   variant: 'edit' | 'delete';
   iconName: IconName;
   label: string;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
-function ActionItem({ variant, iconName, label, onClick }: ActionItemProps) {
+function ActionItem({
+  variant,
+  iconName,
+  label,
+  disabled = false,
+  onClick,
+}: ActionItemProps) {
   return (
     <ActionButton
       variant={variant}
-      className="h-9 w-full justify-start gap-2 px-3 label-medium hover:bg-black-50"
+      className="h-9 w-full justify-start gap-2 px-3 label-medium hover:bg-black-50 disabled:cursor-not-allowed disabled:text-black-200 disabled:hover:bg-black-0"
+      disabled={disabled}
       onClick={onClick}
     >
       <Icon name={iconName} size={16} decorative className="size-4 shrink-0" />
@@ -30,6 +39,7 @@ function ActionItem({ variant, iconName, label, onClick }: ActionItemProps) {
 
 function MoreActionMenu({
   className,
+  isEditDisabled = false,
   onEditClick,
   onDeleteClick,
 }: MoreActionMenuProps) {
@@ -46,6 +56,7 @@ function MoreActionMenu({
         iconName="edit"
         label="수정"
         onClick={onEditClick}
+        disabled={isEditDisabled || !onEditClick}
       />
       <ActionItem
         variant="delete"

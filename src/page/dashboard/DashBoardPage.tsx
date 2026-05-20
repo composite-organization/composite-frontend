@@ -340,7 +340,7 @@ function DashBoardPage() {
 
   function handleQuizEdit(widgetId: string) {
     const target = findQuizWidget(widgets, widgetId);
-    if (!target) return;
+    if (!target || target.isEnded) return;
 
     setEditingQuizWidget(target);
   }
@@ -350,7 +350,7 @@ function DashBoardPage() {
   }
 
   function handleQuizEditSubmit(data: QuizCreateData) {
-    if (!editingQuizWidget?.quizWidgetId) return;
+    if (!editingQuizWidget?.quizWidgetId || editingQuizWidget.isEnded) return;
 
     updateQuizOptionsMutation.mutate(
       {
