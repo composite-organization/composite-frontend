@@ -18,9 +18,22 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
-import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
+import {
+  useLessonQuery,
+  useLessonWidgetIdsQuery,
+} from '@/features/lesson/api/lesson.queries';
 import { useMemoWidgetsQuery } from '@/features/memo/api/memo.queries';
+import {
+  useDeleteQuizWidgetMutation,
+  useQuizWidgetsQuery,
+  useQuizAnswersQueries,
+  useCreateQuizWidgetMutation,
+  useUpdateQuizOptionsMutation,
+  useUpdateQuizStatusMutation,
+} from '@/features/quiz/api/quiz.queries';
 import type { MemoWidget } from '@/features/memo/api/memo.api';
+import type { QuizWidgetDetail } from '@/features/quiz/api/quiz.api';
+import { getCurrentLessonId } from '@/lib/lessonStorage';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -35,11 +48,20 @@ import LectureMaterialsTeacher from '@/features/lecture-materials/ui/LectureMate
 type QuizWidget = {
   type: 'quiz';
   id: string;
+  quizWidgetId?: number;
   question: string;
   choices: string[];
   correctAnswerIndex: number;
+  correctRate: number;
   isEnded: boolean;
+  participantCount: number;
+  participantStatuses: QuizParticipantStatus[];
 };
+
+interface QuizParticipantStatus {
+  choiceIndex: number;
+  participants: string[];
+}
 
 type VoteWidget = {
   type: 'vote';
@@ -64,6 +86,59 @@ type SimpleWidget = {
 };
 
 type DashboardWidget = QuizWidget | VoteWidget | NoteWidget | SimpleWidget;
+
+function findChoiceIndex(
+  options: QuizWidgetDetail['options'],
+  optionId: number,
+): number {
+  return options.findIndex((option) => option.quizOptionId === optionId);
+}
+
+function findCorrectAnswerIndex(
+  detail: QuizWidgetDetail,
+  answerQuizOptionIds: number[],
+): number {
+  const answerIndex = findChoiceIndex(detail.options, answerQuizOptionIds[0]);
+  return answerIndex >= 0 ? answerIndex : 0;
+}
+
+function mapParticipantStatuses(
+  detail: QuizWidgetDetail,
+): QuizParticipantStatus[] {
+  return detail.participationResponse.optionStatuses.flatMap((status) => {
+    const choiceIndex = findChoiceIndex(detail.options, status.optionId);
+
+    if (choiceIndex < 0) return [];
+
+    return [{ choiceIndex, participants: status.participantNames }];
+  });
+}
+
+function mapQuizWidget(
+  detail: QuizWidgetDetail,
+  answerQuizOptionIds: number[],
+): QuizWidget {
+  return {
+    type: 'quiz',
+    id: String(detail.quizWidgetId),
+    quizWidgetId: detail.quizWidgetId,
+    question: detail.title,
+    choices: detail.options.map((option) => option.content),
+    correctAnswerIndex: findCorrectAnswerIndex(detail, answerQuizOptionIds),
+    correctRate: detail.correctRate,
+    isEnded: detail.status === '종료',
+    participantCount: detail.participationResponse.totalParticipantCount,
+    participantStatuses: mapParticipantStatuses(detail),
+  };
+}
+
+function findQuizWidget(
+  widgets: DashboardWidget[],
+  widgetId: string,
+): QuizWidget | undefined {
+  const widget = widgets.find((item) => item.id === widgetId);
+  return widget?.type === 'quiz' ? widget : undefined;
+}
 
 interface SortableWidgetProps {
   widget: DashboardWidget;
@@ -112,38 +187,80 @@ function DashBoardPage() {
     null,
   );
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
+  const [editingQuizWidget, setEditingQuizWidget] = useState<QuizWidget | null>(
+    null,
+  );
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
-  const { data: widgetIdsData } = useLessonWidgetIdsQuery(
-    lessonCode,
-    authToken,
-  );
+  const storedLessonId = getCurrentLessonId();
+  const { data: lessonData } = useLessonQuery(storedLessonId, authToken);
+  const lessonId = lessonData?.lessonId ?? storedLessonId;
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
+  // 메모 위젯
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
   const memoWidgetQueries = useMemoWidgetsQuery(memoWidgetIds, authToken);
+  // 퀴즈 위젯
+  const quizWidgetIds = useMemo(
+    () => widgetIdsData?.widgets.quiz ?? [],
+    [widgetIdsData],
+  );
+  const quizWidgetQueries = useQuizWidgetsQuery(quizWidgetIds, authToken);
+  const quizAnswerQueries = useQuizAnswersQueries(
+    quizWidgetIds,
+    authToken,
+    quizWidgetIds.length > 0,
+  );
+  const createQuizWidgetMutation = useCreateQuizWidgetMutation();
+  const deleteQuizWidgetMutation = useDeleteQuizWidgetMutation();
+  const updateQuizOptionsMutation = useUpdateQuizOptionsMutation();
+  const updateQuizStatusMutation = useUpdateQuizStatusMutation();
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
-    if (memoWidgetIds.length === 0) return;
+    if (memoWidgetIds.length === 0 && quizWidgetIds.length === 0) return;
     if (!memoWidgetQueries.every((query) => query.isSuccess)) return;
+    if (!quizWidgetQueries.every((query) => query.isSuccess)) return;
+    if (!quizAnswerQueries.every((query) => query.isSuccess)) return;
 
     hasInitializedRef.current = true;
-    setWidgets(
-      memoWidgetQueries
-        .map((query) => query.data)
-        .filter((data): data is MemoWidget => data !== undefined)
-        .map((data) => ({
-          type: 'note' as const,
-          id: String(data.id),
-          memoWidgetId: data.id,
-          title: data.title,
-          content: data.content,
-        })),
-    );
-  }, [memoWidgetIds, memoWidgetQueries]);
+
+    const memoWidgets = memoWidgetQueries
+      .map((query) => query.data)
+      .filter((data): data is MemoWidget => data !== undefined)
+      .map((data) => ({
+        type: 'note' as const,
+        id: String(data.id),
+        memoWidgetId: data.id,
+        title: data.title,
+        content: data.content,
+      }));
+
+    const quizWidgets = quizWidgetQueries
+      .map((query, index) => ({
+        answers: quizAnswerQueries[index].data?.answerQuizOptionIds ?? [],
+        detail: query.data,
+      }))
+      .filter(
+        (
+          value,
+        ): value is {
+          answers: number[];
+          detail: QuizWidgetDetail;
+        } => value.detail !== undefined,
+      )
+      .map(({ answers, detail }) => mapQuizWidget(detail, answers));
+    setWidgets([...memoWidgets, ...quizWidgets]);
+  }, [
+    memoWidgetIds,
+    memoWidgetQueries,
+    quizAnswerQueries,
+    quizWidgetIds,
+    quizWidgetQueries,
+  ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -181,18 +298,111 @@ function DashBoardPage() {
   }
 
   function handleQuizSubmit(data: QuizCreateData) {
-    setWidgets((previous) => [
-      ...previous,
+    if (!lessonId) {
+      alert('수업 정보를 불러오지 못해 퀴즈를 생성할 수 없습니다.');
+      return;
+    }
+
+    createQuizWidgetMutation.mutate(
       {
-        type: 'quiz',
-        id: crypto.randomUUID(),
-        question: data.question,
-        choices: data.choices,
-        correctAnswerIndex: data.correctAnswerIndex,
-        isEnded: false,
+        lessonId,
+        title: data.question,
+        options: data.choices.map((choice, index) => ({
+          content: choice,
+          isCorrect: index === data.correctAnswerIndex,
+        })),
       },
-    ]);
-    setActiveCreateModal(null);
+      {
+        onSuccess: (createdQuiz) => {
+          setWidgets((previous) => [
+            ...previous,
+            {
+              type: 'quiz',
+              id: String(createdQuiz.quizWidgetId),
+              quizWidgetId: createdQuiz.quizWidgetId,
+              question: data.question,
+              choices: data.choices,
+              correctAnswerIndex: data.correctAnswerIndex,
+              correctRate: 0,
+              isEnded: false,
+              participantCount: 0,
+              participantStatuses: [],
+            },
+          ]);
+          setActiveCreateModal(null);
+        },
+        onError: () => {
+          alert('퀴즈 생성에 실패했습니다.');
+        },
+      },
+    );
+  }
+
+  function handleQuizEdit(widgetId: string) {
+    const target = findQuizWidget(widgets, widgetId);
+    if (!target || target.isEnded) return;
+
+    setEditingQuizWidget(target);
+  }
+
+  function handleQuizEditClose() {
+    setEditingQuizWidget(null);
+  }
+
+  function handleQuizEditSubmit(data: QuizCreateData) {
+    if (!editingQuizWidget?.quizWidgetId || editingQuizWidget.isEnded) return;
+
+    updateQuizOptionsMutation.mutate(
+      {
+        quizWidgetId: editingQuizWidget.quizWidgetId,
+        options: data.choices.map((choice, index) => ({
+          content: choice,
+          isCorrect: index === data.correctAnswerIndex,
+        })),
+      },
+      {
+        onSuccess: () => {
+          setWidgets((previous) =>
+            previous.map((widget) =>
+              widget.id === editingQuizWidget.id && widget.type === 'quiz'
+                ? {
+                    ...widget,
+                    choices: data.choices,
+                    correctAnswerIndex: data.correctAnswerIndex,
+                  }
+                : widget,
+            ),
+          );
+          setEditingQuizWidget(null);
+        },
+        onError: () => {
+          alert('퀴즈 수정에 실패했습니다.');
+        },
+      },
+    );
+  }
+
+  function handleQuizDelete(widgetId: string) {
+    const target = findQuizWidget(widgets, widgetId);
+    if (!target) return;
+
+    const removeQuizWidget = () => {
+      setWidgets((previous) =>
+        previous.filter((widget) => widget.id !== widgetId),
+      );
+    };
+
+    if (!target.quizWidgetId) {
+      removeQuizWidget();
+      return;
+    }
+
+    deleteQuizWidgetMutation.mutate(target.quizWidgetId, {
+      onSuccess: removeQuizWidget,
+      onError: () => {
+        alert('퀴즈 삭제에 실패했습니다.');
+      },
+    });
   }
 
   function handleVoteSubmit(data: {
@@ -218,6 +428,30 @@ function DashBoardPage() {
   }
 
   function handleQuizEnd(widgetId: string) {
+    const target = widgets.find(
+      (widget) => widget.id === widgetId && widget.type === 'quiz',
+    );
+
+    if (!target || target.type !== 'quiz' || !target.quizWidgetId) return;
+
+    updateQuizStatusMutation.mutate(
+      {
+        quizWidgetId: target.quizWidgetId,
+        body: { status: '종료' },
+      },
+      {
+        onSuccess: () => {
+          setWidgets((previous) =>
+            previous.map((widget) =>
+              widget.id === widgetId && widget.type === 'quiz'
+                ? { ...widget, isEnded: true }
+                : widget,
+            ),
+          );
+        },
+      },
+    );
+
     setWidgets((previous) =>
       previous.map((widget) =>
         widget.id === widgetId && widget.type === 'quiz'
@@ -246,8 +480,12 @@ function DashBoardPage() {
             question={widget.question}
             choices={widget.choices}
             correctIndex={widget.correctAnswerIndex}
-            participantCount={0}
+            correctRate={widget.correctRate}
+            participantCount={widget.participantCount}
+            participantStatuses={widget.participantStatuses}
             isEnded={widget.isEnded}
+            onDelete={() => handleQuizDelete(widget.id)}
+            onEdit={() => handleQuizEdit(widget.id)}
             onEnd={() => handleQuizEnd(widget.id)}
           />
         );
@@ -333,6 +571,17 @@ function DashBoardPage() {
         onClose={handleCloseCreateModal}
         onSubmit={handleQuizSubmit}
       />
+      {editingQuizWidget && (
+        <QuizCreate
+          initialData={editingQuizWidget}
+          isOpen
+          modalTitle="퀴즈 수정"
+          onClose={handleQuizEditClose}
+          onSubmit={handleQuizEditSubmit}
+          questionDisabled
+          submitLabel="수정"
+        />
+      )}
       <VoteCreate
         isOpen={activeCreateModal === 'vote'}
         onCancel={handleCloseCreateModal}

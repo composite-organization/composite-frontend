@@ -19,6 +19,7 @@ export const lessonHandlers = [
     }
 
     return HttpResponse.json({
+      lessonId: 1,
       lessonCode: String(params.lessonCode),
       lessonName: '샘플 수업',
       teacherName: '홍길동',
@@ -40,6 +41,7 @@ export const lessonHandlers = [
     const body = (await request.json()) as Record<string, unknown>;
     return HttpResponse.json(
       {
+        lessonId: 1,
         lessonCode: body.lessonCode,
         lessonName: body.lessonName,
         teacherName: body.teacherName,

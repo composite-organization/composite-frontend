@@ -11,6 +11,7 @@ interface WidgetContainerBaseProps {
   width?: string;
   children: ReactNode;
   showMore?: boolean;
+  isEditDisabled?: boolean;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -29,6 +30,7 @@ interface TeacherWidgetContainerProps {
   description: string;
   width?: string;
   children: ReactNode;
+  isEditDisabled?: boolean;
   onEditClick?: () => void;
   onDeleteClick?: () => void;
 }
@@ -40,6 +42,7 @@ function WidgetContainerBase({
   width = 'w-130',
   children,
   showMore = false,
+  isEditDisabled = false,
   onEditClick,
   onDeleteClick,
 }: WidgetContainerBaseProps) {
@@ -79,6 +82,7 @@ function WidgetContainerBase({
             />
             {isActionMenuOpen && (
               <MoreActionMenu
+                isEditDisabled={isEditDisabled}
                 onEditClick={handleEditClick}
                 onDeleteClick={handleDeleteClick}
               />

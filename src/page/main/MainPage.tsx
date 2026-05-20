@@ -16,6 +16,8 @@ import {
   authenticateLesson,
 } from '@/features/lesson/api/lesson.api';
 import { getGuestToken } from '@/features/guest/api/guest.api';
+import { setAuthToken } from '@/lib/http';
+import { setCurrentLessonId } from '@/lib/lessonStorage';
 
 type SelectedId = 'note' | 'file' | 'quiz' | 'vote' | 'question';
 type ModalType = 'join' | 'find' | 'create' | null;
@@ -54,6 +56,7 @@ export default function MainPage() {
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
+      setCurrentLessonId(lesson.lessonId);
       navigate(`/dashboard/${lessonCode}/${lesson.lessonName}/${teacherName}`);
     }
   }, [
@@ -88,11 +91,9 @@ export default function MainPage() {
       const guestCredentialsResponse = await getGuestToken({
         name: payload.studentName,
       });
-      localStorage.setItem('authToken', guestCredentialsResponse.token);
-      const lesson = await fetchLesson(
-        payload.lessonCode,
-        guestCredentialsResponse.token,
-      );
+      setAuthToken(guestCredentialsResponse.token);
+      const lesson = await fetchLesson(payload.lessonCode);
+      setCurrentLessonId(lesson.lessonId);
       navigate(
         `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
       );
@@ -110,9 +111,9 @@ export default function MainPage() {
         lessonCode: payload.lessonCode,
         password: payload.password,
       });
-      localStorage.setItem('lessonAuthToken', authResponse.token);
-      localStorage.setItem('authToken', authResponse.token);
-      const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
+      setAuthToken(authResponse.token);
+      const lesson = await fetchLesson(payload.lessonCode);
+      setCurrentLessonId(lesson.lessonId);
       navigate(
         `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
       );
@@ -131,7 +132,7 @@ export default function MainPage() {
       const guestCredentialsResponse = await getGuestToken({
         name: payload.teacherName,
       });
-      localStorage.setItem('authToken', guestCredentialsResponse.token);
+      setAuthToken(guestCredentialsResponse.token);
       createLessonMutation.mutate({
         body: {
           teacherName: payload.teacherName,
@@ -139,7 +140,6 @@ export default function MainPage() {
           lessonCode: payload.lessonCode,
           password: payload.password,
         },
-        guestToken: guestCredentialsResponse.token,
       });
       setTeacherName(payload.teacherName);
     } catch {
