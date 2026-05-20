@@ -29,8 +29,8 @@ export async function createLesson(body: CreateLessonRequest): Promise<Lesson> {
   return response.data;
 }
 
-export async function fetchLesson(lessonCode: string): Promise<Lesson> {
-  const response = await http.get<Lesson>(`/lessons/${lessonCode}`);
+export async function fetchLesson(lessonId: number | string): Promise<Lesson> {
+  const response = await http.get<Lesson>(`/lessons/${lessonId}`);
   return response.data;
 }
 
@@ -46,10 +46,10 @@ export interface GetLessonWidgetIdsResponse {
 }
 
 export async function fetchLessonWidgetIds(
-  lessonCode: string,
+  lessonId: number,
 ): Promise<GetLessonWidgetIdsResponse> {
   const response = await http.get<GetLessonWidgetIdsResponse>(
-    `/lessons/${lessonCode}/widgets`,
+    `/lessons/${lessonId}/widgets`,
   );
   return response.data;
 }

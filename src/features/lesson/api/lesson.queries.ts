@@ -8,19 +8,25 @@ import {
   type AuthenticateLessonRequest,
 } from './lesson.api';
 
-export function useLessonQuery(lessonCode: string, guestToken: string) {
+export function useLessonQuery(
+  lessonId: number | undefined,
+  guestToken: string,
+) {
   return useQuery({
-    queryKey: ['lesson', 'detail', lessonCode, guestToken],
-    queryFn: () => fetchLesson(lessonCode),
-    enabled: !!lessonCode && !!guestToken,
+    queryKey: ['lesson', 'detail', lessonId, guestToken],
+    queryFn: () => fetchLesson(lessonId as number),
+    enabled: Number.isFinite(lessonId) && !!guestToken,
   });
 }
 
-export function useLessonWidgetIdsQuery(lessonCode: string, token: string) {
+export function useLessonWidgetIdsQuery(
+  lessonId: number | undefined,
+  token: string,
+) {
   return useQuery({
-    queryKey: ['lesson', 'widgets', lessonCode],
-    queryFn: () => fetchLessonWidgetIds(lessonCode),
-    enabled: !!lessonCode && !!token,
+    queryKey: ['lesson', 'widgets', lessonId],
+    queryFn: () => fetchLessonWidgetIds(lessonId as number),
+    enabled: Number.isFinite(lessonId) && !!token,
   });
 }
 

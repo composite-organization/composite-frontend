@@ -126,12 +126,10 @@ function DashBoardPage() {
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
-  const { data: lessonData } = useLessonQuery(lessonCode, authToken);
-  const lessonId = lessonData?.lessonId ?? getCurrentLessonId();
-  const { data: widgetIdsData } = useLessonWidgetIdsQuery(
-    lessonCode,
-    authToken,
-  );
+  const storedLessonId = getCurrentLessonId();
+  const { data: lessonData } = useLessonQuery(storedLessonId, authToken);
+  const lessonId = lessonData?.lessonId ?? storedLessonId;
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
   // 메모 위젯
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
