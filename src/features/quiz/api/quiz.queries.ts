@@ -96,7 +96,7 @@ export function useUpdateQuizOptionsMutation() {
     }: {
       quizWidgetId: number;
       options: CreateQuizOptionRequest[];
-    }) => updateQuizOptions(quizWidgetId, { options }),
+    }) => updateQuizOptions(quizWidgetId, { quizWidgetId, options }),
     onSuccess: (_data, { quizWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['quiz', 'detail', quizWidgetId],
@@ -109,18 +109,8 @@ export function useUpdateQuizOptionsMutation() {
 }
 
 export function useDeleteQuizWidgetMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (quizWidgetId: number) => deleteQuizWidget(quizWidgetId),
-    onSuccess: (_data, quizWidgetId) => {
-      queryClient.invalidateQueries({ queryKey: ['lesson', 'widgets'] });
-      queryClient.invalidateQueries({ queryKey: ['quiz'] });
-      queryClient.removeQueries({ queryKey: ['quiz', 'detail', quizWidgetId] });
-      queryClient.removeQueries({
-        queryKey: ['quiz', 'answers', quizWidgetId],
-      });
-    },
   });
 }
 

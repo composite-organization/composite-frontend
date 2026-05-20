@@ -45,6 +45,7 @@ export interface UpdateQuizStatusRequest {
 }
 
 interface UpdateQuizOptionsRequest {
+  quizWidgetId: number;
   options: CreateQuizOptionRequest[];
 }
 

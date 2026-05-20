@@ -19,6 +19,8 @@ interface QuizTeacherProps {
   isEnded: boolean;
   correctRate?: number;
   participantStatuses?: ParticipantStatus[];
+  onDelete?: () => void;
+  onEdit?: () => void;
   onEnd: () => void;
 }
 
@@ -30,6 +32,8 @@ function QuizTeacher({
   isEnded,
   correctRate = 0,
   participantStatuses = [],
+  onDelete,
+  onEdit,
   onEnd,
 }: QuizTeacherProps) {
   const [isEndModalOpen, setIsEndModalOpen] = useState(false);
@@ -57,6 +61,8 @@ function QuizTeacher({
         iconName="quiz"
         title="퀴즈"
         description="퀴즈 위젯"
+        onDeleteClick={onDelete}
+        onEditClick={onEdit}
       >
         <div className="flex flex-col gap-5 px-4 pt-4 pb-5">
           <p className="body-regular text-black-500">{question}</p>
