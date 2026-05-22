@@ -21,6 +21,12 @@ import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList'
 import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 import { fetchMemoWidget } from '@/features/memo/api/memo.api';
+import { useCreateVoteWidgetMutation } from '@/features/vote/api/vote.queries';
+import {
+  fetchVoteWidget,
+  type VoteOptionResponse,
+  type VoteParticipationResponse,
+} from '@/features/vote/api/vote.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -45,6 +51,7 @@ type QuizWidget = {
 type VoteWidget = {
   type: 'vote';
   id: string;
+  voteWidgetId?: number;
   title: string;
   description: string;
   selections: VoteSelectionItem[];
@@ -98,6 +105,41 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
   );
 }
 
+function buildVoteSettingBadges(
+  isAnonymous: boolean,
+  isMultiSelectable: boolean,
+): string[] {
+  const badges: string[] = [];
+  if (isAnonymous) badges.push('익명');
+  if (isMultiSelectable) badges.push('복수선택');
+  return badges;
+}
+
+function buildVoteSelections(
+  options: VoteOptionResponse[],
+  participation?: VoteParticipationResponse,
+): VoteSelectionItem[] {
+  const totalParticipantCount = participation?.totalParticipantCount ?? 0;
+  return options.map((option) => {
+    const anonymousCount = participation?.anonymousOptionStatuses?.find(
+      (status) => status.optionId === option.id,
+    )?.count;
+    const identifiedCount = participation?.identifiedOptionStatuses?.find(
+      (status) => status.optionId === option.id,
+    )?.voterNames.length;
+    const voteCount = anonymousCount ?? identifiedCount ?? 0;
+    return {
+      id: String(option.id),
+      label: option.content,
+      voteCount,
+      votedPercentage:
+        totalParticipantCount > 0
+          ? Math.round((voteCount / totalParticipantCount) * 100)
+          : 0,
+    };
+  });
+}
+
 function DashBoardPage() {
   const {
     lessonCode = '',
@@ -125,35 +167,64 @@ function DashBoardPage() {
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
+  const voteWidgetIds = useMemo(
+    () => widgetIdsData?.widgets.vote ?? [],
+    [widgetIdsData],
+  );
   const createMemoMutation = useCreateMemoWidgetMutation(authToken);
+  const createVoteMutation = useCreateVoteWidgetMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
-    if (memoWidgetIds.length === 0) return;
     if (!authToken) return;
+    if (!widgetIdsData) return;
 
-    const loadMemoWidgets = async () => {
+    const loadWidgets = async () => {
       try {
-        const memoWidgetDataArray = await Promise.all(
-          memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
-        );
-        setWidgets(
-          memoWidgetDataArray.map((data) => ({
-            type: 'note' as const,
+        const [memoWidgetDataArray, voteWidgetDataArray] = await Promise.all([
+          Promise.all(
+            memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
+          ),
+          Promise.all(
+            voteWidgetIds.map((id) => fetchVoteWidget(id, authToken)),
+          ),
+        ]);
+        const memoWidgets: DashboardWidget[] = memoWidgetDataArray.map(
+          (data) => ({
+            type: 'note',
             id: String(data.id),
             memoWidgetId: data.id,
             title: data.title,
             content: data.content,
-          })),
+          }),
         );
+        const voteWidgets: DashboardWidget[] = voteWidgetDataArray.map(
+          (data) => ({
+            type: 'vote',
+            id: String(data.id),
+            voteWidgetId: data.id,
+            title: data.title,
+            description: '',
+            selections: buildVoteSelections(
+              data.options,
+              data.participationResponse,
+            ),
+            options: buildVoteSettingBadges(
+              data.isAnonymous,
+              data.isMultiSelectable,
+            ),
+          }),
+        );
+        setWidgets([...memoWidgets, ...voteWidgets]);
         hasInitializedRef.current = true;
-      } catch {
+      } catch (error) {
+        console.error('위젯 초기 로드 실패', error);
         hasInitializedRef.current = true;
       }
     };
 
-    loadMemoWidgets();
-  }, [memoWidgetIds, authToken]);
+    loadWidgets();
+  }, [widgetIdsData, memoWidgetIds, voteWidgetIds, authToken]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -238,20 +309,41 @@ function DashBoardPage() {
     selections: VoteSelectionItem[];
     options: { id: string; label: string; enabled: boolean }[];
   }) {
-    setWidgets((previous) => [
-      ...previous,
+    if (!lessonId) return;
+    const isAnonymous =
+      data.options.find((option) => option.id === 'anonymous')?.enabled ??
+      false;
+    const isMultiSelectable =
+      data.options.find((option) => option.id === 'multiple')?.enabled ?? false;
+    createVoteMutation.mutate(
       {
-        type: 'vote',
-        id: crypto.randomUUID(),
+        lessonId,
         title: data.title,
-        description: data.description,
-        selections: data.selections,
-        options: data.options
-          .filter((option) => option.enabled)
-          .map((option) => option.label),
+        options: data.selections.map((selection) => selection.label),
+        isAnonymous,
+        isMultiSelectable,
       },
-    ]);
-    setActiveCreateModal(null);
+      {
+        onSuccess: (createdVote) => {
+          setWidgets((previous) => [
+            ...previous,
+            {
+              type: 'vote',
+              id: String(createdVote.id),
+              voteWidgetId: createdVote.id,
+              title: createdVote.title,
+              description: data.description,
+              selections: buildVoteSelections(createdVote.options),
+              options: buildVoteSettingBadges(
+                createdVote.isAnonymous,
+                createdVote.isMultiSelectable,
+              ),
+            },
+          ]);
+          setActiveCreateModal(null);
+        },
+      },
+    );
   }
 
   function handleQuizEnd(widgetId: string) {
