@@ -24,7 +24,10 @@ import {
 } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 import { fetchMemoWidget } from '@/features/memo/api/memo.api';
-import { useCreateVoteWidgetMutation } from '@/features/vote/api/vote.queries';
+import {
+  useCreateVoteWidgetMutation,
+  useSubmitVoteMutation,
+} from '@/features/vote/api/vote.queries';
 import {
   fetchVoteWidget,
   type VoteOptionResponse,
@@ -183,6 +186,7 @@ function DashBoardPage() {
   );
   const createMemoMutation = useCreateMemoWidgetMutation(authToken);
   const createVoteMutation = useCreateVoteWidgetMutation(authToken);
+  const submitVoteMutation = useSubmitVoteMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -356,6 +360,40 @@ function DashBoardPage() {
     );
   }
 
+  function handleVoteStudentSubmit(
+    voteWidgetId: number,
+    selectedIds: string[],
+  ) {
+    submitVoteMutation.mutate(
+      {
+        voteWidgetId,
+        body: { optionIds: selectedIds.map(Number) },
+      },
+      {
+        onSuccess: async () => {
+          try {
+            const updatedVote = await fetchVoteWidget(voteWidgetId, authToken);
+            setWidgets((previous) =>
+              previous.map((widget) =>
+                widget.type === 'vote' && widget.voteWidgetId === voteWidgetId
+                  ? {
+                      ...widget,
+                      selections: buildVoteSelections(
+                        updatedVote.options,
+                        updatedVote.participationResponse,
+                      ),
+                    }
+                  : widget,
+              ),
+            );
+          } catch (error) {
+            console.error('투표 결과 갱신 실패', error);
+          }
+        },
+      },
+    );
+  }
+
   function handleQuizEnd(widgetId: string) {
     setWidgets((previous) =>
       previous.map((widget) =>
@@ -414,7 +452,11 @@ function DashBoardPage() {
             selections={widget.selections}
             options={widget.options}
             isMultipleChoice={widget.options.includes('복수선택')}
-            onSubmit={() => {}}
+            onSubmit={(selectedIds) => {
+              if (widget.voteWidgetId !== undefined) {
+                handleVoteStudentSubmit(widget.voteWidgetId, selectedIds);
+              }
+            }}
           />
         );
       case 'question':
