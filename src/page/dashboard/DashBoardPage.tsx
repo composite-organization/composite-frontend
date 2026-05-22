@@ -37,10 +37,15 @@ import QuizCreate, { type QuizCreateData } from '@/features/quiz/ui/QuizCreate';
 import VoteCreate from '@/features/vote/ui/VoteCreate';
 import MemoCreate, { type MemoCreateData } from '@/features/memo/ui/MemoCreate';
 import QuizTeacher from '@/features/quiz/ui/QuizTeacher';
+import QuizStudent from '@/features/quiz/ui/QuizStudent';
 import VoteTeacher from '@/features/vote/ui/VoteTeacher';
+import VoteStudent from '@/features/vote/ui/VoteStudent';
 import QuestionTeacher from '@/features/question/ui/QuestionTeacher';
+import QuestionStudent from '@/features/question/ui/QuestionStudent';
 import MemoTeacher from '@/features/memo/ui/MemoTeacher';
+import MemoStudent from '@/features/memo/ui/MemoStudent';
 import LectureMaterialsTeacher from '@/features/lecture-materials/ui/LectureMaterialsTeacher';
+import LectureMaterialsStudent from '@/features/lecture-materials/ui/LectureMaterialsStudent';
 
 type QuizWidget = {
   type: 'quiz';
@@ -144,12 +149,17 @@ function buildVoteSelections(
 }
 
 function DashBoardPage() {
-  const { lessonCode = '', lessonId: lessonIdParam = '' } = useParams<{
+  const {
+    role = 'teacher',
+    lessonCode = '',
+    lessonId: lessonIdParam = '',
+  } = useParams<{
     role: string;
     lessonCode: string;
     lessonId: string;
   }>();
   const lessonId = Number(lessonIdParam);
+  const isTeacher = role !== 'student';
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeCreateModal, setActiveCreateModal] = useState<WidgetName | null>(
     null,
@@ -370,7 +380,7 @@ function DashBoardPage() {
   function renderWidget(widget: DashboardWidget) {
     switch (widget.type) {
       case 'quiz':
-        return (
+        return isTeacher ? (
           <QuizTeacher
             question={widget.question}
             choices={widget.choices}
@@ -379,33 +389,67 @@ function DashBoardPage() {
             isEnded={widget.isEnded}
             onEnd={() => handleQuizEnd(widget.id)}
           />
+        ) : (
+          <QuizStudent
+            question={widget.question}
+            choices={widget.choices}
+            correctAnswerIndex={widget.correctAnswerIndex}
+            participantCount={0}
+            isEnded={widget.isEnded}
+            onSubmit={() => {}}
+          />
         );
       case 'vote':
-        return (
+        return isTeacher ? (
           <VoteTeacher
             title={widget.title}
             description={widget.description}
             selections={widget.selections}
             options={widget.options}
           />
+        ) : (
+          <VoteStudent
+            title={widget.title}
+            description={widget.description}
+            selections={widget.selections}
+            options={widget.options}
+            isMultipleChoice={widget.options.includes('복수선택')}
+            onSubmit={() => {}}
+          />
         );
       case 'question':
-        return (
+        return isTeacher ? (
           <QuestionTeacher
             questions={[]}
             currentPage={1}
             onPageChange={() => {}}
           />
+        ) : (
+          <QuestionStudent
+            questions={[]}
+            currentPage={1}
+            onPageChange={() => {}}
+            onSubmitQuestion={() => {}}
+          />
         );
       case 'note':
-        return <MemoTeacher title={widget.title} content={widget.content} />;
+        return isTeacher ? (
+          <MemoTeacher title={widget.title} content={widget.content} />
+        ) : (
+          <MemoStudent title={widget.title} memo={widget.content} />
+        );
       case 'file':
-        return (
+        return isTeacher ? (
           <LectureMaterialsTeacher
             materials={[] as LectureMaterial[]}
             onUpload={() => {}}
             onDownload={() => {}}
             onDelete={() => {}}
+          />
+        ) : (
+          <LectureMaterialsStudent
+            materials={[] as LectureMaterial[]}
+            onDownload={() => {}}
           />
         );
       default:
@@ -419,14 +463,19 @@ function DashBoardPage() {
       <DashboardHeader
         lessonName={lessonName}
         teacherName={teacherName}
-        onOpenModal={handleOpenAddModal}
+        onOpenModal={isTeacher ? handleOpenAddModal : undefined}
       />
       <div className="px-30 py-6">
-        {widgets.length === 0 ? (
+        {widgets.length === 0 && (
           <div className="flex w-full items-center justify-center py-20">
-            <p className="body-medium text-black-200">위젯을 생성해주세요.</p>
+            <p className="body-medium text-black-200">
+              {isTeacher
+                ? '위젯을 생성해주세요.'
+                : '아직 생성된 위젯이 없습니다.'}
+            </p>
           </div>
-        ) : (
+        )}
+        {widgets.length > 0 && isTeacher && (
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -445,6 +494,15 @@ function DashBoardPage() {
               </div>
             </SortableContext>
           </DndContext>
+        )}
+        {widgets.length > 0 && !isTeacher && (
+          <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
+            {widgets.map((widget) => (
+              <div key={widget.id} className="mb-5 break-inside-avoid">
+                {renderWidget(widget)}
+              </div>
+            ))}
+          </div>
         )}
       </div>
       <AddWidgetModal
