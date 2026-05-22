@@ -12,7 +12,6 @@ import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
 import {
-  fetchLesson,
   authenticateLesson,
   joinLessonAsStudent,
 } from '@/features/lesson/api/lesson.api';
@@ -40,7 +39,6 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
-  const [teacherName, setTeacherName] = useState<string>('');
 
   const createLessonMutation = useCreateLessonMutation();
 
@@ -55,16 +53,13 @@ export default function MainPage() {
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
-      navigate(
-        `/dashboard/${lessonCode}/${lesson.lessonId}/${lesson.lessonName}/${teacherName}`,
-      );
+      navigate(`/dashboard/teacher/${lessonCode}/${lesson.lessonId}`);
     }
   }, [
     createLessonMutation.isSuccess,
     createLessonMutation.data,
     navigate,
     lessonCode,
-    teacherName,
   ]);
 
   const handleCloseModal = () => {
@@ -97,13 +92,7 @@ export default function MainPage() {
         { name: payload.studentName },
         guestCredentialsResponse.token,
       );
-      const lesson = await fetchLesson(
-        lessonId,
-        guestCredentialsResponse.token,
-      );
-      navigate(
-        `/dashboard/${payload.lessonCode}/${lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
-      );
+      navigate(`/dashboard/student/${payload.lessonCode}/${lessonId}`);
     } catch {
       // eslint-disable-next-line no-empty
     }
@@ -120,12 +109,8 @@ export default function MainPage() {
       });
       localStorage.setItem('lessonAuthToken', authResponse.token);
       localStorage.setItem('authToken', authResponse.token);
-      const lesson = await fetchLesson(
-        authResponse.lessonId,
-        authResponse.token,
-      );
       navigate(
-        `/dashboard/${payload.lessonCode}/${authResponse.lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
+        `/dashboard/teacher/${payload.lessonCode}/${authResponse.lessonId}`,
       );
     } catch {
       // eslint-disable-next-line no-empty
@@ -152,7 +137,6 @@ export default function MainPage() {
         },
         guestToken: guestCredentialsResponse.token,
       });
-      setTeacherName(payload.teacherName);
     } catch {
       // eslint-disable-next-line no-empty
     }

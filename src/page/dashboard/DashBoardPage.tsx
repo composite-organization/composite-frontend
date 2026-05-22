@@ -18,7 +18,10 @@ import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
-import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
+import {
+  useLessonQuery,
+  useLessonWidgetIdsQuery,
+} from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import { useCreateVoteWidgetMutation } from '@/features/vote/api/vote.queries';
@@ -141,16 +144,10 @@ function buildVoteSelections(
 }
 
 function DashBoardPage() {
-  const {
-    lessonCode = '',
-    lessonId: lessonIdParam = '',
-    lessonName = '',
-    teacherName = '',
-  } = useParams<{
+  const { lessonCode = '', lessonId: lessonIdParam = '' } = useParams<{
+    role: string;
     lessonCode: string;
     lessonId: string;
-    lessonName: string;
-    teacherName: string;
   }>();
   const lessonId = Number(lessonIdParam);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -162,6 +159,9 @@ function DashBoardPage() {
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
+  const { data: lessonData } = useLessonQuery(lessonId, authToken);
+  const lessonName = lessonData?.lessonName ?? '';
+  const teacherName = lessonData?.teacherName ?? '';
   const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
