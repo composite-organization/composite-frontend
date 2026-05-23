@@ -119,23 +119,21 @@ function DashBoardPage() {
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const hasInitializedRef = useRef(false);
 
-  const authToken = localStorage.getItem('authToken') ?? '';
-  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId);
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
-  const createMemoMutation = useCreateMemoWidgetMutation(authToken);
+  const createMemoMutation = useCreateMemoWidgetMutation();
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
     if (memoWidgetIds.length === 0) return;
-    if (!authToken) return;
 
     const loadMemoWidgets = async () => {
       try {
         const memoWidgetDataArray = await Promise.all(
-          memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
+          memoWidgetIds.map((id) => fetchMemoWidget(id)),
         );
         setWidgets(
           memoWidgetDataArray.map((data) => ({
@@ -153,7 +151,7 @@ function DashBoardPage() {
     };
 
     loadMemoWidgets();
-  }, [memoWidgetIds, authToken]);
+  }, [memoWidgetIds]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
