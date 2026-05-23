@@ -34,8 +34,10 @@ function AttachmentBlock({
             {attachment.name}
           </span>
           <span className="caption-regular text-black-200">
-            {formatFileSize(attachment.size)} ·{' '}
-            {formatUploadedAt(attachment.uploadedAt)}
+            {formatFileSize(attachment.size)}
+            {attachment.uploadedAt
+              ? ` · ${formatUploadedAt(attachment.uploadedAt)}`
+              : ''}
           </span>
         </div>
       </div>

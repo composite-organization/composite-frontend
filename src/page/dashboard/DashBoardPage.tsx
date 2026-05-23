@@ -21,6 +21,13 @@ import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList'
 import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
 import { fetchMemoWidget } from '@/features/memo/api/memo.api';
+import {
+  useAttachmentWidgetAttachmentsQuery,
+  useCreateAttachmentWidgetMutation,
+  useDeleteAttachmentWidgetAttachmentMutation,
+  useUploadAttachmentWidgetAttachmentMutation,
+} from '@/features/attachment-widget/api/attachmentWidget.queries';
+import { fetchAttachmentWidgetAttachmentDetail } from '@/features/attachment-widget/api/attachmentWidget.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -60,11 +67,22 @@ type NoteWidget = {
 };
 
 type SimpleWidget = {
-  type: 'question' | 'file';
+  type: 'question';
   id: string;
 };
 
-type DashboardWidget = QuizWidget | VoteWidget | NoteWidget | SimpleWidget;
+type AttachmentDashboardWidget = {
+  type: 'file';
+  id: string;
+  attachmentWidgetId: number;
+};
+
+type DashboardWidget =
+  | QuizWidget
+  | VoteWidget
+  | NoteWidget
+  | SimpleWidget
+  | AttachmentDashboardWidget;
 
 interface SortableWidgetProps {
   widget: DashboardWidget;
@@ -98,6 +116,65 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
   );
 }
 
+interface AttachmentWidgetCardProps {
+  attachmentWidgetId: number;
+  token: string;
+}
+
+function AttachmentWidgetCard({
+  attachmentWidgetId,
+  token,
+}: AttachmentWidgetCardProps) {
+  const { data: attachmentData = [] } = useAttachmentWidgetAttachmentsQuery(
+    attachmentWidgetId,
+    token,
+  );
+  const uploadAttachmentMutation =
+    useUploadAttachmentWidgetAttachmentMutation(token);
+  const deleteAttachmentMutation =
+    useDeleteAttachmentWidgetAttachmentMutation(token);
+
+  const attachments: AttachmentWidget[] = attachmentData.map((attachment) => ({
+    id: String(attachment.id),
+    name: attachment.name,
+    size: attachment.size,
+  }));
+
+  function handleUpload(files: FileList) {
+    Array.from(files).forEach((file) => {
+      uploadAttachmentMutation.mutate({
+        attachmentWidgetId,
+        body: { attachment: file },
+      });
+    });
+  }
+
+  async function handleDownload(attachment: AttachmentWidget) {
+    const { url } = await fetchAttachmentWidgetAttachmentDetail(
+      attachmentWidgetId,
+      Number(attachment.id),
+      token,
+    );
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  function handleDelete(attachment: AttachmentWidget) {
+    deleteAttachmentMutation.mutate({
+      attachmentWidgetId,
+      attachmentId: Number(attachment.id),
+    });
+  }
+
+  return (
+    <AttachmentWidgetTeacher
+      attachments={attachments}
+      onUpload={handleUpload}
+      onDownload={handleDownload}
+      onDelete={handleDelete}
+    />
+  );
+}
+
 function DashBoardPage() {
   const {
     lessonCode = '',
@@ -125,35 +202,46 @@ function DashBoardPage() {
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
+  const attachmentWidgetIds = useMemo(
+    () => widgetIdsData?.widgets.attachment ?? [],
+    [widgetIdsData],
+  );
   const createMemoMutation = useCreateMemoWidgetMutation(authToken);
+  const createAttachmentWidgetMutation =
+    useCreateAttachmentWidgetMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
-    if (memoWidgetIds.length === 0) return;
+    if (!widgetIdsData) return;
     if (!authToken) return;
 
-    const loadMemoWidgets = async () => {
+    const loadDashboardWidgets = async () => {
       try {
         const memoWidgetDataArray = await Promise.all(
           memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
         );
-        setWidgets(
-          memoWidgetDataArray.map((data) => ({
+        setWidgets([
+          ...memoWidgetDataArray.map((data) => ({
             type: 'note' as const,
             id: String(data.id),
             memoWidgetId: data.id,
             title: data.title,
             content: data.content,
           })),
-        );
+          ...attachmentWidgetIds.map((id) => ({
+            type: 'file' as const,
+            id: `attachment-${id}`,
+            attachmentWidgetId: id,
+          })),
+        ]);
         hasInitializedRef.current = true;
       } catch {
         hasInitializedRef.current = true;
       }
     };
 
-    loadMemoWidgets();
-  }, [memoWidgetIds, authToken]);
+    loadDashboardWidgets();
+  }, [memoWidgetIds, attachmentWidgetIds, widgetIdsData, authToken]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -175,6 +263,25 @@ function DashBoardPage() {
     }
     if (id === 'note') {
       setIsMemoCreateOpen(true);
+      return;
+    }
+    if (id === 'file') {
+      if (!lessonId) return;
+      createAttachmentWidgetMutation.mutate(
+        { lessonId },
+        {
+          onSuccess: (createdAttachmentWidget) => {
+            setWidgets((previous) => [
+              ...previous,
+              {
+                type: 'file',
+                id: `attachment-${createdAttachmentWidget.id}`,
+                attachmentWidgetId: createdAttachmentWidget.id,
+              },
+            ]);
+          },
+        },
+      );
       return;
     }
     setWidgets((previous) => [
@@ -309,11 +416,9 @@ function DashBoardPage() {
         return <MemoTeacher title={widget.title} content={widget.content} />;
       case 'file':
         return (
-          <AttachmentWidgetTeacher
-            attachments={[] as AttachmentWidget[]}
-            onUpload={() => {}}
-            onDownload={() => {}}
-            onDelete={() => {}}
+          <AttachmentWidgetCard
+            attachmentWidgetId={widget.attachmentWidgetId}
+            token={authToken}
           />
         );
       default:
