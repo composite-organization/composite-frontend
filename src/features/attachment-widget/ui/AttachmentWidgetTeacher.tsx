@@ -8,6 +8,7 @@ interface AttachmentWidgetTeacherProps {
   onUpload: (files: FileList) => void;
   onDownload: (attachment: AttachmentWidget) => void;
   onDelete: (attachment: AttachmentWidget) => void;
+  onDeleteWidget?: () => void;
 }
 
 function AttachmentWidgetTeacher({
@@ -15,12 +16,14 @@ function AttachmentWidgetTeacher({
   onUpload,
   onDownload,
   onDelete,
+  onDeleteWidget,
 }: AttachmentWidgetTeacherProps) {
   return (
     <TeacherWidgetContainer
       iconName="file"
       title="강의 자료"
       description="강의 자료 위젯"
+      onDeleteClick={onDeleteWidget}
     >
       <div className="flex flex-col gap-5 px-4 pt-4 pb-5">
         <UploadBlock hasFiles={attachments.length > 0} onUpload={onUpload} />

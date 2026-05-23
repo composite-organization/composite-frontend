@@ -24,6 +24,7 @@ import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import {
   useAttachmentWidgetAttachmentsQuery,
   useCreateAttachmentWidgetMutation,
+  useDeleteAttachmentWidgetMutation,
   useDeleteAttachmentWidgetAttachmentMutation,
   useUploadAttachmentWidgetAttachmentMutation,
 } from '@/features/attachment-widget/api/attachmentWidget.queries';
@@ -119,11 +120,13 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
 interface AttachmentWidgetCardProps {
   attachmentWidgetId: number;
   token: string;
+  onDeleteWidget: () => void;
 }
 
 function AttachmentWidgetCard({
   attachmentWidgetId,
   token,
+  onDeleteWidget,
 }: AttachmentWidgetCardProps) {
   const { data: attachmentData = [] } = useAttachmentWidgetAttachmentsQuery(
     attachmentWidgetId,
@@ -171,6 +174,7 @@ function AttachmentWidgetCard({
       onUpload={handleUpload}
       onDownload={handleDownload}
       onDelete={handleDelete}
+      onDeleteWidget={onDeleteWidget}
     />
   );
 }
@@ -209,6 +213,8 @@ function DashBoardPage() {
   const createMemoMutation = useCreateMemoWidgetMutation(authToken);
   const createAttachmentWidgetMutation =
     useCreateAttachmentWidgetMutation(authToken);
+  const deleteAttachmentWidgetMutation =
+    useDeleteAttachmentWidgetMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -371,6 +377,16 @@ function DashBoardPage() {
     );
   }
 
+  function handleDeleteAttachmentWidget(widget: AttachmentDashboardWidget) {
+    deleteAttachmentWidgetMutation.mutate(widget.attachmentWidgetId, {
+      onSuccess: () => {
+        setWidgets((previous) =>
+          previous.filter((item) => item.id !== widget.id),
+        );
+      },
+    });
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -419,6 +435,7 @@ function DashBoardPage() {
           <AttachmentWidgetCard
             attachmentWidgetId={widget.attachmentWidgetId}
             token={authToken}
+            onDeleteWidget={() => handleDeleteAttachmentWidget(widget)}
           />
         );
       default:
