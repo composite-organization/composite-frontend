@@ -28,7 +28,10 @@ import {
   useDeleteAttachmentWidgetAttachmentMutation,
   useUploadAttachmentWidgetAttachmentMutation,
 } from '@/features/attachment-widget/api/attachmentWidget.queries';
-import { fetchAttachmentWidgetAttachmentDetail } from '@/features/attachment-widget/api/attachmentWidget.api';
+import {
+  fetchAttachmentWidgetAttachmentDetail,
+  fetchAttachmentWidgetAttachments,
+} from '@/features/attachment-widget/api/attachmentWidget.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -151,14 +154,42 @@ function AttachmentWidgetCard({
       });
     });
   }
-
+  function downloadFile(url: string, fileName: string) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
   async function handleDownload(attachment: AttachmentWidget) {
     const { url } = await fetchAttachmentWidgetAttachmentDetail(
       attachmentWidgetId,
       Number(attachment.id),
       token,
     );
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const fileName = await fetchAttachmentWidgetAttachments(
+      attachmentWidgetId,
+      token,
+    ).then((attachmentList) => {
+      const targetAttachment = attachmentList.find(
+        (att) => String(att.id) === attachment.id,
+      );
+      return targetAttachment ? targetAttachment.name : 'downloaded_file';
+    });
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to download attachment');
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      downloadFile(objectUrl, fileName);
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      downloadFile(url, fileName);
+    }
   }
 
   function handleDelete(attachment: AttachmentWidget) {
