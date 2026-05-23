@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
-import type { AttachmentWidget } from '@/features/attachment-widget/types';
+import type { AttachmentWidget } from '@/features/attachment/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
 import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
@@ -27,11 +27,11 @@ import {
   useDeleteAttachmentWidgetMutation,
   useDeleteAttachmentWidgetAttachmentMutation,
   useUploadAttachmentWidgetAttachmentMutation,
-} from '@/features/attachment-widget/api/attachmentWidget.queries';
+} from '@/features/attachment/api/attachment.queries';
 import {
   fetchAttachmentWidgetAttachmentDetail,
   fetchAttachmentWidgetAttachments,
-} from '@/features/attachment-widget/api/attachmentWidget.api';
+} from '@/features/attachment/api/attachment.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
@@ -42,7 +42,7 @@ import QuizTeacher from '@/features/quiz/ui/QuizTeacher';
 import VoteTeacher from '@/features/vote/ui/VoteTeacher';
 import QuestionTeacher from '@/features/question/ui/QuestionTeacher';
 import MemoTeacher from '@/features/memo/ui/MemoTeacher';
-import AttachmentWidgetTeacher from '@/features/attachment-widget/ui/AttachmentWidgetTeacher';
+import AttachmentWidgetTeacher from '@/features/attachment/ui/AttachmentTeacher';
 
 type QuizWidget = {
   type: 'quiz';

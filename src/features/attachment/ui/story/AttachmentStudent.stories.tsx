@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { AttachmentWidget } from '../../types';
-import AttachmentWidgetStudent from '../AttachmentWidgetStudent';
+import AttachmentWidgetStudent from '../AttachmentStudent';
 
 const meta: Meta<typeof AttachmentWidgetStudent> = {
   title: 'Feature/AttachmentWidgetStudent',

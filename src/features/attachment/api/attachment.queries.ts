@@ -9,7 +9,7 @@ import {
   uploadAttachmentWidgetAttachment,
   type CreateAttachmentWidgetRequest,
   type UploadAttachmentWidgetAttachmentRequest,
-} from './attachmentWidget.api';
+} from './attachment.api';
 
 export function useCreateAttachmentWidgetMutation(token: string) {
   const queryClient = useQueryClient();
