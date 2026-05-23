@@ -1,4 +1,4 @@
-export interface LectureMaterial {
+export interface AttachmentWidget {
   id: string;
   name: string;
   size: number;

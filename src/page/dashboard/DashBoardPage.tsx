@@ -16,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { WidgetName } from '@/shared/types/widget.type';
-import type { LectureMaterial } from '@/features/lecture-materials/types';
+import type { AttachmentWidget } from '@/features/attachment-widget/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
 import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
 import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
@@ -31,7 +31,7 @@ import QuizTeacher from '@/features/quiz/ui/QuizTeacher';
 import VoteTeacher from '@/features/vote/ui/VoteTeacher';
 import QuestionTeacher from '@/features/question/ui/QuestionTeacher';
 import MemoTeacher from '@/features/memo/ui/MemoTeacher';
-import LectureMaterialsTeacher from '@/features/lecture-materials/ui/LectureMaterialsTeacher';
+import AttachmentWidgetTeacher from '@/features/attachment-widget/ui/AttachmentWidgetTeacher';
 
 type QuizWidget = {
   type: 'quiz';
@@ -309,8 +309,8 @@ function DashBoardPage() {
         return <MemoTeacher title={widget.title} content={widget.content} />;
       case 'file':
         return (
-          <LectureMaterialsTeacher
-            materials={[] as LectureMaterial[]}
+          <AttachmentWidgetTeacher
+            attachments={[] as AttachmentWidget[]}
             onUpload={() => {}}
             onDownload={() => {}}
             onDelete={() => {}}

@@ -1,7 +1,7 @@
 import Icon from '@/shared/components/ui/icon/Icon';
 import IconButton from '@/shared/components/ui/icon-button/IconButton';
 import { formatUploadedAt } from '@/lib/formatDate';
-import type { LectureMaterial } from '../../types';
+import type { AttachmentWidget } from '../../types';
 
 function formatFileSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -9,19 +9,19 @@ function formatFileSize(bytes: number): string {
   return `${bytes} B`;
 }
 
-interface MaterialBlockProps {
-  material: LectureMaterial;
+interface AttachmentBlockProps {
+  attachment: AttachmentWidget;
   showDeleteButton?: boolean;
-  onDownload: (material: LectureMaterial) => void;
-  onDelete?: (material: LectureMaterial) => void;
+  onDownload: (attachment: AttachmentWidget) => void;
+  onDelete?: (attachment: AttachmentWidget) => void;
 }
 
-function MaterialBlock({
-  material,
+function AttachmentBlock({
+  attachment,
   showDeleteButton = false,
   onDownload,
   onDelete,
-}: MaterialBlockProps) {
+}: AttachmentBlockProps) {
   return (
     <div className="flex flex-row items-center justify-between px-3 py-3 bg-black-0 border border-black-200 rounded-xl w-full">
       <div className="flex flex-row items-center gap-3">
@@ -31,11 +31,11 @@ function MaterialBlock({
 
         <div className="flex flex-col gap-1">
           <span className="label-medium text-black-500 truncate max-w-23.75">
-            {material.name}
+            {attachment.name}
           </span>
           <span className="caption-regular text-black-200">
-            {formatFileSize(material.size)} ·{' '}
-            {formatUploadedAt(material.uploadedAt)}
+            {formatFileSize(attachment.size)} ·{' '}
+            {formatUploadedAt(attachment.uploadedAt)}
           </span>
         </div>
       </div>
@@ -44,14 +44,14 @@ function MaterialBlock({
         <IconButton
           size="small"
           iconName="download"
-          onClick={() => onDownload(material)}
+          onClick={() => onDownload(attachment)}
         />
 
         {showDeleteButton && (
           <IconButton
             size="small"
             iconName="delete"
-            onClick={() => onDelete?.(material)}
+            onClick={() => onDelete?.(attachment)}
           />
         )}
       </div>
@@ -59,4 +59,4 @@ function MaterialBlock({
   );
 }
 
-export default MaterialBlock;
+export default AttachmentBlock;

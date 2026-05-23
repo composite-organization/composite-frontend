@@ -1,17 +1,17 @@
 import { StudentWidgetContainer } from '@/shared/components/widget/widget-container/WidgetContainer';
 import EmptyFileIllustration from './components/EmptyFileIllustration';
-import MaterialBlock from './blocks/MaterialBlock';
-import type { LectureMaterial } from '../types';
+import AttachmentBlock from './blocks/AttachmentBlock';
+import type { AttachmentWidget } from '../types';
 
-interface LectureMaterialsStudentProps {
-  materials: LectureMaterial[];
-  onDownload: (material: LectureMaterial) => void;
+interface AttachmentWidgetStudentProps {
+  attachments: AttachmentWidget[];
+  onDownload: (attachment: AttachmentWidget) => void;
 }
 
-function LectureMaterialsStudent({
-  materials,
+function AttachmentWidgetStudent({
+  attachments,
   onDownload,
-}: LectureMaterialsStudentProps) {
+}: AttachmentWidgetStudentProps) {
   return (
     <StudentWidgetContainer
       iconName="file"
@@ -19,7 +19,7 @@ function LectureMaterialsStudent({
       description="강의 자료 위젯"
     >
       <div className="flex flex-col items-center gap-5 px-4 pt-4 pb-5">
-        {materials.length === 0 ? (
+        {attachments.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 py-2.5">
             <EmptyFileIllustration />
             <span className="body-medium text-black-200">
@@ -28,9 +28,12 @@ function LectureMaterialsStudent({
           </div>
         ) : (
           <ul className="flex flex-col gap-2 w-full">
-            {materials.map((material) => (
-              <li key={material.id}>
-                <MaterialBlock material={material} onDownload={onDownload} />
+            {attachments.map((attachment) => (
+              <li key={attachment.id}>
+                <AttachmentBlock
+                  attachment={attachment}
+                  onDownload={onDownload}
+                />
               </li>
             ))}
           </ul>
@@ -40,4 +43,4 @@ function LectureMaterialsStudent({
   );
 }
 
-export default LectureMaterialsStudent;
+export default AttachmentWidgetStudent;

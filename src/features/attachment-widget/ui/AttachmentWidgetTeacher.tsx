@@ -1,21 +1,21 @@
 import { TeacherWidgetContainer } from '@/shared/components/widget/widget-container/WidgetContainer';
-import MaterialBlock from './blocks/MaterialBlock';
+import AttachmentBlock from './blocks/AttachmentBlock';
 import UploadBlock from './blocks/UploadBlock';
-import type { LectureMaterial } from '../types';
+import type { AttachmentWidget } from '../types';
 
-interface LectureMaterialsTeacherProps {
-  materials: LectureMaterial[];
+interface AttachmentWidgetTeacherProps {
+  attachments: AttachmentWidget[];
   onUpload: (files: FileList) => void;
-  onDownload: (material: LectureMaterial) => void;
-  onDelete: (material: LectureMaterial) => void;
+  onDownload: (attachment: AttachmentWidget) => void;
+  onDelete: (attachment: AttachmentWidget) => void;
 }
 
-function LectureMaterialsTeacher({
-  materials,
+function AttachmentWidgetTeacher({
+  attachments,
   onUpload,
   onDownload,
   onDelete,
-}: LectureMaterialsTeacherProps) {
+}: AttachmentWidgetTeacherProps) {
   return (
     <TeacherWidgetContainer
       iconName="file"
@@ -23,14 +23,14 @@ function LectureMaterialsTeacher({
       description="강의 자료 위젯"
     >
       <div className="flex flex-col gap-5 px-4 pt-4 pb-5">
-        <UploadBlock hasFiles={materials.length > 0} onUpload={onUpload} />
+        <UploadBlock hasFiles={attachments.length > 0} onUpload={onUpload} />
 
-        {materials.length > 0 && (
+        {attachments.length > 0 && (
           <ul className="flex flex-col gap-2 w-full">
-            {materials.map((material) => (
-              <li key={material.id}>
-                <MaterialBlock
-                  material={material}
+            {attachments.map((attachment) => (
+              <li key={attachment.id}>
+                <AttachmentBlock
+                  attachment={attachment}
                   showDeleteButton
                   onDownload={onDownload}
                   onDelete={onDelete}
@@ -44,4 +44,4 @@ function LectureMaterialsTeacher({
   );
 }
 
-export default LectureMaterialsTeacher;
+export default AttachmentWidgetTeacher;
