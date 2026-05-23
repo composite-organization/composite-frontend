@@ -14,6 +14,7 @@ import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
 import {
   fetchLesson,
   authenticateLesson,
+  joinLessonAsStudent,
 } from '@/features/lesson/api/lesson.api';
 import { getGuestToken } from '@/features/guest/api/guest.api';
 
@@ -39,6 +40,7 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
+  const [teacherName, setTeacherName] = useState<string>('');
 
   const createLessonMutation = useCreateLessonMutation();
 
@@ -54,7 +56,7 @@ export default function MainPage() {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
       navigate(
-        `/dashboard/${lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+        `/dashboard/${lessonCode}/${lesson.lessonId}/${lesson.lessonName}/${teacherName}`,
       );
     }
   }, [
@@ -62,6 +64,7 @@ export default function MainPage() {
     createLessonMutation.data,
     navigate,
     lessonCode,
+    teacherName,
   ]);
 
   const handleCloseModal = () => {
@@ -89,12 +92,17 @@ export default function MainPage() {
         name: payload.studentName,
       });
       localStorage.setItem('authToken', guestCredentialsResponse.token);
-      const lesson = await fetchLesson(
+      const { lessonId } = await joinLessonAsStudent(
         payload.lessonCode,
+        { name: payload.studentName },
+        guestCredentialsResponse.token,
+      );
+      const lesson = await fetchLesson(
+        lessonId,
         guestCredentialsResponse.token,
       );
       navigate(
-        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+        `/dashboard/${payload.lessonCode}/${lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
       );
     } catch {
       // eslint-disable-next-line no-empty
@@ -112,9 +120,12 @@ export default function MainPage() {
       });
       localStorage.setItem('lessonAuthToken', authResponse.token);
       localStorage.setItem('authToken', authResponse.token);
-      const lesson = await fetchLesson(payload.lessonCode, authResponse.token);
+      const lesson = await fetchLesson(
+        authResponse.lessonId,
+        authResponse.token,
+      );
       navigate(
-        `/dashboard/${payload.lessonCode}/${lesson.lessonName}/${lesson.teacherName}`,
+        `/dashboard/${payload.lessonCode}/${authResponse.lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
       );
     } catch {
       // eslint-disable-next-line no-empty
@@ -141,6 +152,7 @@ export default function MainPage() {
         },
         guestToken: guestCredentialsResponse.token,
       });
+      setTeacherName(payload.teacherName);
     } catch {
       // eslint-disable-next-line no-empty
     }

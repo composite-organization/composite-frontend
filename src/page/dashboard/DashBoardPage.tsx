@@ -19,13 +19,14 @@ import type { WidgetName } from '@/shared/types/widget.type';
 import type { LectureMaterial } from '@/features/lecture-materials/types';
 import type { VoteSelectionItem } from '@/features/vote/ui/blocks/SelectionList';
 import { useLessonWidgetIdsQuery } from '@/features/lesson/api/lesson.queries';
-import { useMemoWidgetsQuery } from '@/features/memo/api/memo.queries';
-import type { MemoWidget } from '@/features/memo/api/memo.api';
+import { useCreateMemoWidgetMutation } from '@/features/memo/api/memo.queries';
+import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';
 import QuizCreate, { type QuizCreateData } from '@/features/quiz/ui/QuizCreate';
 import VoteCreate from '@/features/vote/ui/VoteCreate';
+import MemoCreate, { type MemoCreateData } from '@/features/memo/ui/MemoCreate';
 import QuizTeacher from '@/features/quiz/ui/QuizTeacher';
 import VoteTeacher from '@/features/vote/ui/VoteTeacher';
 import QuestionTeacher from '@/features/question/ui/QuestionTeacher';
@@ -100,50 +101,59 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
 function DashBoardPage() {
   const {
     lessonCode = '',
+    lessonId: lessonIdParam = '',
     lessonName = '',
     teacherName = '',
   } = useParams<{
     lessonCode: string;
+    lessonId: string;
     lessonName: string;
     teacherName: string;
   }>();
+  const lessonId = Number(lessonIdParam);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [activeCreateModal, setActiveCreateModal] = useState<WidgetName | null>(
     null,
   );
+  const [isMemoCreateOpen, setIsMemoCreateOpen] = useState(false);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const hasInitializedRef = useRef(false);
 
   const authToken = localStorage.getItem('authToken') ?? '';
-  const { data: widgetIdsData } = useLessonWidgetIdsQuery(
-    lessonCode,
-    authToken,
-  );
+  const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId, authToken);
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
     [widgetIdsData],
   );
-  const memoWidgetQueries = useMemoWidgetsQuery(memoWidgetIds, authToken);
+  const createMemoMutation = useCreateMemoWidgetMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
     if (memoWidgetIds.length === 0) return;
-    if (!memoWidgetQueries.every((query) => query.isSuccess)) return;
+    if (!authToken) return;
 
-    hasInitializedRef.current = true;
-    setWidgets(
-      memoWidgetQueries
-        .map((query) => query.data)
-        .filter((data): data is MemoWidget => data !== undefined)
-        .map((data) => ({
-          type: 'note' as const,
-          id: String(data.id),
-          memoWidgetId: data.id,
-          title: data.title,
-          content: data.content,
-        })),
-    );
-  }, [memoWidgetIds, memoWidgetQueries]);
+    const loadMemoWidgets = async () => {
+      try {
+        const memoWidgetDataArray = await Promise.all(
+          memoWidgetIds.map((id) => fetchMemoWidget(id, authToken)),
+        );
+        setWidgets(
+          memoWidgetDataArray.map((data) => ({
+            type: 'note' as const,
+            id: String(data.id),
+            memoWidgetId: data.id,
+            title: data.title,
+            content: data.content,
+          })),
+        );
+        hasInitializedRef.current = true;
+      } catch {
+        hasInitializedRef.current = true;
+      }
+    };
+
+    loadMemoWidgets();
+  }, [memoWidgetIds, authToken]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -164,10 +174,7 @@ function DashBoardPage() {
       return;
     }
     if (id === 'note') {
-      setWidgets((previous) => [
-        ...previous,
-        { type: 'note', id: crypto.randomUUID(), title: '', content: '' },
-      ]);
+      setIsMemoCreateOpen(true);
       return;
     }
     setWidgets((previous) => [
@@ -178,6 +185,36 @@ function DashBoardPage() {
 
   function handleCloseCreateModal() {
     setActiveCreateModal(null);
+  }
+
+  function handleCloseMemoCreateModal() {
+    setIsMemoCreateOpen(false);
+  }
+
+  function handleMemoSubmit(data: MemoCreateData) {
+    if (!lessonId) return;
+    createMemoMutation.mutate(
+      {
+        lessonId,
+        title: data.title,
+        content: data.content,
+      },
+      {
+        onSuccess: (createdMemo) => {
+          setWidgets((previous) => [
+            ...previous,
+            {
+              type: 'note',
+              id: String(createdMemo.id),
+              memoWidgetId: createdMemo.id,
+              title: createdMemo.title,
+              content: createdMemo.content,
+            },
+          ]);
+          setIsMemoCreateOpen(false);
+        },
+      },
+    );
   }
 
   function handleQuizSubmit(data: QuizCreateData) {
@@ -269,12 +306,7 @@ function DashBoardPage() {
           />
         );
       case 'note':
-        return (
-          <MemoTeacher
-            initialTitle={widget.title}
-            initialMemo={widget.content}
-          />
-        );
+        return <MemoTeacher title={widget.title} content={widget.content} />;
       case 'file':
         return (
           <LectureMaterialsTeacher
@@ -337,6 +369,11 @@ function DashBoardPage() {
         isOpen={activeCreateModal === 'vote'}
         onCancel={handleCloseCreateModal}
         onSubmit={handleVoteSubmit}
+      />
+      <MemoCreate
+        isOpen={isMemoCreateOpen}
+        onClose={handleCloseMemoCreateModal}
+        onSubmit={handleMemoSubmit}
       />
     </div>
   );
