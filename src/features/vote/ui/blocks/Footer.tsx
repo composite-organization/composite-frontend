@@ -5,6 +5,7 @@ interface FooterProps {
   onStatusClick?: () => void;
   onSubmitClick?: () => void;
   submitLabel?: string;
+  statusLabel?: string;
   isSubmitDisabled?: boolean;
 }
 
@@ -12,11 +13,12 @@ function Footer({
   onStatusClick,
   onSubmitClick,
   submitLabel = '제출하기',
+  statusLabel = '현황',
   isSubmitDisabled = false,
 }: FooterProps) {
   return (
     <div className="flex flex-row justify-between items-center w-full h-8">
-      <StatusButton onClick={onStatusClick} />
+      <StatusButton onClick={onStatusClick} label={statusLabel} />
       <Button
         variant="blue"
         size="xs"

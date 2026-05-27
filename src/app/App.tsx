@@ -8,7 +8,7 @@ function AppContent() {
     <Routes>
       <Route path="/" element={<MainPage />} />
       <Route
-        path="/dashboard/:lessonCode/:lessonId/:lessonName/:teacherName"
+        path="/dashboard/:role/:lessonCode/:lessonId"
         element={<DashBoardPage />}
       />
     </Routes>

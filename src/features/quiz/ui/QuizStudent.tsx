@@ -50,7 +50,7 @@ function QuizStudent({
   }
 
   return (
-    <div className="relative w-130">
+    <div className="w-full max-w-130">
       <StudentWidgetContainer
         iconName="quiz"
         title="퀴즈"

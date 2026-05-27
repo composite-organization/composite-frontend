@@ -19,7 +19,6 @@ function MemoStudent({
       iconName="note"
       title={widgetName}
       description={widgetDescription}
-      width="w-[520px]"
     >
       <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2">
         <MemoItem title={title} memo={memo} isEditable={false} />

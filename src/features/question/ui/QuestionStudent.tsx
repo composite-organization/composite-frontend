@@ -34,7 +34,6 @@ function QuestionStudent({
       iconName="question"
       title={widgetName}
       description={widgetDescription}
-      width="w-[520px]"
     >
       <div className="flex flex-col items-start px-4 pt-4 pb-5 gap-2">
         <QuestionInputCard onSubmit={onSubmitQuestion} />

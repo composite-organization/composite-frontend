@@ -13,10 +13,13 @@ interface StudentSelectionListProps {
   selections: VoteSelectionItem[];
   selectedIds: string[];
   onSelect: (id: string) => void;
+  isEnded?: boolean;
+  selectedOptionIds?: number[];
 }
 
 interface TeacherSelectionListProps {
   selections: VoteSelectionItem[];
+  selectedOptionIds?: number[];
 }
 
 interface EditableSelectionListProps {
@@ -36,11 +39,18 @@ function StudentList({
   selections,
   selectedIds,
   onSelect,
+  isEnded = false,
+  selectedOptionIds,
 }: StudentSelectionListProps) {
   return (
     <ul className="flex flex-col gap-2.5 w-full">
       {selections.map((selection, index) => {
-        const isSelected = selectedIds.includes(selection.id);
+        const isWinner =
+          selectedOptionIds?.includes(Number(selection.id)) ?? false;
+        const isHighlighted = isEnded
+          ? isWinner
+          : selectedIds.includes(selection.id);
+        const handleClick = isEnded ? undefined : () => onSelect(selection.id);
         return (
           <li
             key={selection.id}
@@ -48,17 +58,19 @@ function StudentList({
           >
             <SelectionButton
               label={String(index + 1)}
-              variant={isSelected ? 'selected' : 'default'}
-              onClick={() => onSelect(selection.id)}
+              variant={isHighlighted ? 'selected' : 'default'}
+              onClick={handleClick}
               ariaLabel={`선택지 ${index + 1}: ${selection.label}`}
             />
             <div className="relative flex-1">
               <button
                 type="button"
-                onClick={() => onSelect(selection.id)}
+                onClick={handleClick}
+                disabled={isEnded}
                 className={cn(
-                  'flex flex-row items-center px-5 py-4 h-12 w-full rounded-xl border-2 overflow-hidden cursor-pointer',
-                  isSelected ? 'border-blue-300' : 'border-black-200',
+                  'flex flex-row items-center px-5 py-4 h-12 w-full rounded-xl border-2 overflow-hidden',
+                  isHighlighted ? 'border-blue-300' : 'border-black-200',
+                  isEnded ? 'cursor-default' : 'cursor-pointer',
                 )}
                 style={
                   selection.votedPercentage !== undefined
@@ -85,42 +97,61 @@ function StudentList({
   );
 }
 
-function TeacherList({ selections }: TeacherSelectionListProps) {
+function TeacherList({
+  selections,
+  selectedOptionIds,
+}: TeacherSelectionListProps) {
   return (
     <ul className="flex flex-col gap-2.5 w-full">
-      {selections.map((selection, index) => (
-        <li
-          key={selection.id}
-          className="flex flex-row items-center gap-2 w-full"
-        >
-          <SelectionButton
-            label={String(index + 1)}
-            variant="default"
-            ariaLabel={`선택지 ${index + 1}: ${selection.label}`}
-          />
-          <div className="relative flex-1">
-            <div
-              className="flex flex-row items-center px-5 py-4 h-12 rounded-xl border-2 border-black-200 overflow-hidden"
-              style={
-                selection.votedPercentage !== undefined
-                  ? {
-                      background: `linear-gradient(90deg, rgba(0, 24, 236, 0.17) ${selection.votedPercentage}%, #FEFEFE ${selection.votedPercentage}%)`,
-                    }
-                  : {}
-              }
-            >
-              <span className="flex-1 text-left body-medium text-black-500">
-                {selection.label}
-              </span>
-              {selection.voteCount !== undefined && (
-                <span className="absolute right-5 top-4 body-medium text-black-200">
-                  {selection.voteCount}명
-                </span>
+      {selections.map((selection, index) => {
+        const isWinner =
+          selectedOptionIds?.includes(Number(selection.id)) ?? false;
+        return (
+          <li
+            key={selection.id}
+            className="flex flex-row items-center gap-2 w-full"
+          >
+            <div className="relative w-12 h-12">
+              {isWinner && (
+                <img
+                  src="/icons/crown.svg"
+                  alt=""
+                  aria-hidden="true"
+                  width={20}
+                  height={14}
+                  className="absolute -top-3 left-6.5 rotate-25"
+                />
               )}
+              <SelectionButton
+                label={String(index + 1)}
+                variant="default"
+                ariaLabel={`선택지 ${index + 1}: ${selection.label}`}
+              />
             </div>
-          </div>
-        </li>
-      ))}
+            <div className="relative flex-1">
+              <div
+                className="flex flex-row items-center px-5 py-4 h-12 rounded-xl border-2 border-black-200 overflow-hidden"
+                style={
+                  selection.votedPercentage !== undefined
+                    ? {
+                        background: `linear-gradient(90deg, rgba(0, 24, 236, 0.17) ${selection.votedPercentage}%, #FEFEFE ${selection.votedPercentage}%)`,
+                      }
+                    : {}
+                }
+              >
+                <span className="flex-1 text-left body-medium text-black-500">
+                  {selection.label}
+                </span>
+                {selection.voteCount !== undefined && (
+                  <span className="absolute right-5 top-4 body-medium text-black-200">
+                    {selection.voteCount}명
+                  </span>
+                )}
+              </div>
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -187,19 +218,26 @@ function EditableList({
 
 function SelectionList({ variant, ...rest }: SelectionListProps) {
   if (variant === 'student') {
-    const { selections, selectedIds, onSelect } =
+    const { selections, selectedIds, onSelect, isEnded, selectedOptionIds } =
       rest as StudentSelectionListProps;
     return (
       <StudentList
         selections={selections}
         selectedIds={selectedIds}
         onSelect={onSelect}
+        isEnded={isEnded}
+        selectedOptionIds={selectedOptionIds}
       />
     );
   }
   if (variant === 'teacher') {
-    const { selections } = rest as TeacherSelectionListProps;
-    return <TeacherList selections={selections} />;
+    const { selections, selectedOptionIds } = rest as TeacherSelectionListProps;
+    return (
+      <TeacherList
+        selections={selections}
+        selectedOptionIds={selectedOptionIds}
+      />
+    );
   }
   const { selections, onChangeLabel, onRemove } =
     rest as EditableSelectionListProps;

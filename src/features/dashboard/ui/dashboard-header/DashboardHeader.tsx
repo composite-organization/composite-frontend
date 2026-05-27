@@ -3,7 +3,7 @@ import Button from '@/shared/components/ui/button/Button';
 interface DashBoardHeaderProps {
   lessonName: string;
   teacherName: string;
-  onOpenModal: () => void;
+  onOpenModal?: () => void;
 }
 
 function DashboardHeader({
@@ -17,9 +17,11 @@ function DashboardHeader({
         <h2 className="h2-semibold text-black-500">{lessonName}</h2>
         <p className="body-medium text-black-500">{teacherName}</p>
       </div>
-      <Button variant="blue" size="md" onClick={onOpenModal}>
-        + 위젯 추가
-      </Button>
+      {onOpenModal && (
+        <Button variant="blue" size="md" onClick={onOpenModal}>
+          + 위젯 추가
+        </Button>
+      )}
     </header>
   );
 }

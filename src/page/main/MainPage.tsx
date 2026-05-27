@@ -12,7 +12,6 @@ import FindLessonModal from '@/features/main/components/modal/find-lesson-modal/
 import CreateLessonModal from '@/features/main/components/modal/create-lesson-modal/CreateLessonModal';
 import { useCreateLessonMutation } from '@/features/lesson/api/lesson.queries';
 import {
-  fetchLesson,
   authenticateLesson,
   joinLessonAsStudent,
 } from '@/features/lesson/api/lesson.api';
@@ -40,7 +39,6 @@ export default function MainPage() {
   const [submittedJoinCode, setSubmittedJoinCode] = useState('');
   const [submittedFindCode, setSubmittedFindCode] = useState('');
   const [lessonCode, setLessonCode] = useState<string>('');
-  const [teacherName, setTeacherName] = useState<string>('');
 
   const createLessonMutation = useCreateLessonMutation();
 
@@ -55,16 +53,13 @@ export default function MainPage() {
   useEffect(() => {
     if (createLessonMutation.isSuccess && createLessonMutation.data) {
       const lesson = createLessonMutation.data;
-      navigate(
-        `/dashboard/${lessonCode}/${lesson.lessonId}/${lesson.lessonName}/${teacherName}`,
-      );
+      navigate(`/dashboard/teacher/${lessonCode}/${lesson.lessonId}`);
     }
   }, [
     createLessonMutation.isSuccess,
     createLessonMutation.data,
     navigate,
     lessonCode,
-    teacherName,
   ]);
 
   const handleCloseModal = () => {
@@ -97,13 +92,7 @@ export default function MainPage() {
         { name: payload.studentName },
         guestCredentialsResponse.token,
       );
-      const lesson = await fetchLesson(
-        lessonId,
-        guestCredentialsResponse.token,
-      );
-      navigate(
-        `/dashboard/${payload.lessonCode}/${lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
-      );
+      navigate(`/dashboard/student/${payload.lessonCode}/${lessonId}`);
     } catch {
       // eslint-disable-next-line no-empty
     }
@@ -120,12 +109,8 @@ export default function MainPage() {
       });
       localStorage.setItem('lessonAuthToken', authResponse.token);
       localStorage.setItem('authToken', authResponse.token);
-      const lesson = await fetchLesson(
-        authResponse.lessonId,
-        authResponse.token,
-      );
       navigate(
-        `/dashboard/${payload.lessonCode}/${authResponse.lessonId}/${lesson.lessonName}/${lesson.teacherName}`,
+        `/dashboard/teacher/${payload.lessonCode}/${authResponse.lessonId}`,
       );
     } catch {
       // eslint-disable-next-line no-empty
@@ -152,52 +137,53 @@ export default function MainPage() {
         },
         guestToken: guestCredentialsResponse.token,
       });
-      setTeacherName(payload.teacherName);
     } catch {
       // eslint-disable-next-line no-empty
     }
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col h-screen w-full">
       <DashboardHeader logoOnly />
-      <main className="flex w-full justify-center px-30 py-10">
-        <div className="flex flex-col items-center w-full gap-20">
-          <section className="flex w-full gap-30 justify-between items-stretch">
-            <div className="flex flex-1 min-w-0">
-              <VideoSection
-                className="h-full w-full"
-                selectedId={selectedWidgetId}
-              />
-            </div>
-            <div className="flex flex-col gap-20 w-auto shrink-0">
-              <HeroSection />
-              <EntranceSection
-                onJoin={handleJoin}
-                onFind={handleFind}
-                onCreate={handleCreateCode}
-              />
-            </div>
-          </section>
-          <section className="flex flex-col gap-8 w-full">
-            <SectionDivider
-              className="flex items-center"
-              text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
-            />
-            <div className="flex gap-9 w-full">
-              {WIDGET_DATA.map((widget) => (
-                <WidgetDescriptionCard
-                  key={widget.id}
-                  iconName={widget.id}
-                  title={widget.title}
-                  description={widget.description}
-                  isSelected={selectedWidgetId === widget.id}
-                  onClick={() => setSelectedWidgetId(widget.id)}
-                  className="flex-1"
+      <main className="flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-auto flex justify-center px-30 py-10">
+          <div className="flex flex-col items-center w-full gap-20">
+            <section className="flex w-full gap-30 justify-between items-stretch">
+              <div className="flex flex-1 min-w-0">
+                <VideoSection
+                  className="h-full w-full"
+                  selectedId={selectedWidgetId}
                 />
-              ))}
-            </div>
-          </section>
+              </div>
+              <div className="flex flex-col gap-20 w-auto shrink-0">
+                <HeroSection />
+                <EntranceSection
+                  onJoin={handleJoin}
+                  onFind={handleFind}
+                  onCreate={handleCreateCode}
+                />
+              </div>
+            </section>
+            <section className="flex flex-col gap-8 w-full">
+              <SectionDivider
+                className="flex items-center"
+                text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
+              />
+              <div className="flex gap-9 w-full">
+                {WIDGET_DATA.map((widget) => (
+                  <WidgetDescriptionCard
+                    key={widget.id}
+                    iconName={widget.id}
+                    title={widget.title}
+                    description={widget.description}
+                    isSelected={selectedWidgetId === widget.id}
+                    onClick={() => setSelectedWidgetId(widget.id)}
+                    className="flex-1"
+                  />
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
         {openedModal === 'join' && (
           <JoinLessonModal
