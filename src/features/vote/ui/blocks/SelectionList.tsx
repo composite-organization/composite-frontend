@@ -113,23 +113,12 @@ function TeacherList({
           >
             <div className="relative">
               {isWinner && (
-                <svg
-                  width="20"
-                  height="14"
-                  viewBox="0 0 20 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 -rotate-12"
+                <img
+                  src="/icons/crown.svg"
+                  alt=""
                   aria-hidden="true"
-                >
-                  <path
-                    d="M2 12 L1 3 L5 6 L10 2 L15 6 L19 3 L18 12 Z"
-                    fill="#FBBF24"
-                    stroke="#D97706"
-                    strokeWidth="0.6"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-12"
+                />
               )}
               <SelectionButton
                 label={String(index + 1)}
