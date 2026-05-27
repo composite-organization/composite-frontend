@@ -37,7 +37,7 @@ function WidgetContainerBase({
   iconName,
   title,
   description,
-  width = 'w-130',
+  width = 'w-full max-w-130',
   children,
   showMore = false,
   onEditClick,

@@ -107,7 +107,7 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
         transition,
         opacity: isDragging ? 0.5 : 1,
       }}
-      className="mb-5 break-inside-avoid cursor-grab active:cursor-grabbing"
+      className="cursor-grab active:cursor-grabbing"
       {...attributes}
       {...listeners}
     >
@@ -500,73 +500,75 @@ function DashBoardPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="flex flex-col h-screen w-full">
       <SiteHeader entryCode={lessonCode} participantCount={0} />
-      <DashboardHeader
-        lessonName={lessonName}
-        teacherName={teacherName}
-        onOpenModal={isTeacher ? handleOpenAddModal : undefined}
-      />
-      <div className="px-30 py-6">
-        {widgets.length === 0 && (
-          <div className="flex w-full items-center justify-center py-20">
-            <p className="body-medium text-black-200">
-              {isTeacher
-                ? '위젯을 생성해주세요.'
-                : '아직 생성된 위젯이 없습니다.'}
-            </p>
-          </div>
-        )}
-        {widgets.length > 0 && isTeacher && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={widgets.map((widget) => widget.id)}
-              strategy={rectSortingStrategy}
-            >
-              <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
+      <main className="flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-auto">
+          <DashboardHeader
+            lessonName={lessonName}
+            teacherName={teacherName}
+            onOpenModal={isTeacher ? handleOpenAddModal : undefined}
+          />
+          <div className="px-30 py-6">
+            {widgets.length === 0 && (
+              <div className="flex w-full items-center justify-center py-20">
+                <p className="body-medium text-black-200">
+                  {isTeacher
+                    ? '위젯을 생성해주세요.'
+                    : '아직 생성된 위젯이 없습니다.'}
+                </p>
+              </div>
+            )}
+            {widgets.length > 0 && isTeacher && (
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={widgets.map((widget) => widget.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[1920px]:grid-cols-4">
+                    {widgets.map((widget) => (
+                      <SortableWidget key={widget.id} widget={widget}>
+                        {renderWidget(widget)}
+                      </SortableWidget>
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            )}
+            {widgets.length > 0 && !isTeacher && (
+              <div className="grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 min-[1920px]:grid-cols-4">
                 {widgets.map((widget) => (
-                  <SortableWidget key={widget.id} widget={widget}>
-                    {renderWidget(widget)}
-                  </SortableWidget>
+                  <div key={widget.id}>{renderWidget(widget)}</div>
                 ))}
               </div>
-            </SortableContext>
-          </DndContext>
-        )}
-        {widgets.length > 0 && !isTeacher && (
-          <div className="columns-1 gap-5 md:columns-2 lg:columns-3 xl:columns-4">
-            {widgets.map((widget) => (
-              <div key={widget.id} className="mb-5 break-inside-avoid">
-                {renderWidget(widget)}
-              </div>
-            ))}
+            )}
           </div>
-        )}
-      </div>
-      <AddWidgetModal
-        isOpen={isAddModalOpen}
-        onClose={handleCloseAddModal}
-        onSelectWidget={handleSelectWidget}
-      />
-      <QuizCreate
-        isOpen={activeCreateModal === 'quiz'}
-        onClose={handleCloseCreateModal}
-        onSubmit={handleQuizSubmit}
-      />
-      <VoteCreate
-        isOpen={activeCreateModal === 'vote'}
-        onCancel={handleCloseCreateModal}
-        onSubmit={handleVoteSubmit}
-      />
-      <MemoCreate
-        isOpen={isMemoCreateOpen}
-        onClose={handleCloseMemoCreateModal}
-        onSubmit={handleMemoSubmit}
-      />
+        </div>
+        <AddWidgetModal
+          isOpen={isAddModalOpen}
+          onClose={handleCloseAddModal}
+          onSelectWidget={handleSelectWidget}
+        />
+        <QuizCreate
+          isOpen={activeCreateModal === 'quiz'}
+          onClose={handleCloseCreateModal}
+          onSubmit={handleQuizSubmit}
+        />
+        <VoteCreate
+          isOpen={activeCreateModal === 'vote'}
+          onCancel={handleCloseCreateModal}
+          onSubmit={handleVoteSubmit}
+        />
+        <MemoCreate
+          isOpen={isMemoCreateOpen}
+          onClose={handleCloseMemoCreateModal}
+          onSubmit={handleMemoSubmit}
+        />
+      </main>
     </div>
   );
 }

@@ -143,45 +143,47 @@ export default function MainPage() {
   };
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col h-screen w-full">
       <DashboardHeader logoOnly />
-      <main className="flex w-full justify-center px-30 py-10">
-        <div className="flex flex-col items-center w-full gap-20">
-          <section className="flex w-full gap-30 justify-between items-stretch">
-            <div className="flex flex-1 min-w-0">
-              <VideoSection
-                className="h-full w-full"
-                selectedId={selectedWidgetId}
-              />
-            </div>
-            <div className="flex flex-col gap-20 w-auto shrink-0">
-              <HeroSection />
-              <EntranceSection
-                onJoin={handleJoin}
-                onFind={handleFind}
-                onCreate={handleCreateCode}
-              />
-            </div>
-          </section>
-          <section className="flex flex-col gap-8 w-full">
-            <SectionDivider
-              className="flex items-center"
-              text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
-            />
-            <div className="flex gap-9 w-full">
-              {WIDGET_DATA.map((widget) => (
-                <WidgetDescriptionCard
-                  key={widget.id}
-                  iconName={widget.id}
-                  title={widget.title}
-                  description={widget.description}
-                  isSelected={selectedWidgetId === widget.id}
-                  onClick={() => setSelectedWidgetId(widget.id)}
-                  className="flex-1"
+      <main className="flex-1 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-auto flex justify-center px-30 py-10">
+          <div className="flex flex-col items-center w-full gap-20">
+            <section className="flex w-full gap-30 justify-between items-stretch">
+              <div className="flex flex-1 min-w-0">
+                <VideoSection
+                  className="h-full w-full"
+                  selectedId={selectedWidgetId}
                 />
-              ))}
-            </div>
-          </section>
+              </div>
+              <div className="flex flex-col gap-20 w-auto shrink-0">
+                <HeroSection />
+                <EntranceSection
+                  onJoin={handleJoin}
+                  onFind={handleFind}
+                  onCreate={handleCreateCode}
+                />
+              </div>
+            </section>
+            <section className="flex flex-col gap-8 w-full">
+              <SectionDivider
+                className="flex items-center"
+                text="카드를 클릭해 위젯 기능을 미리 확인해보세요"
+              />
+              <div className="flex gap-9 w-full">
+                {WIDGET_DATA.map((widget) => (
+                  <WidgetDescriptionCard
+                    key={widget.id}
+                    iconName={widget.id}
+                    title={widget.title}
+                    description={widget.description}
+                    isSelected={selectedWidgetId === widget.id}
+                    onClick={() => setSelectedWidgetId(widget.id)}
+                    className="flex-1"
+                  />
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
         {openedModal === 'join' && (
           <JoinLessonModal

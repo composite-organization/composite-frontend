@@ -52,7 +52,7 @@ function QuizTeacher({
   }
 
   return (
-    <div className="relative w-130">
+    <div className="w-full max-w-130">
       <TeacherWidgetContainer
         iconName="quiz"
         title="퀴즈"
