@@ -111,13 +111,15 @@ function TeacherList({
             key={selection.id}
             className="flex flex-row items-center gap-2 w-full"
           >
-            <div className="relative">
+            <div className="relative w-12 h-12">
               {isWinner && (
                 <img
                   src="/icons/crown.svg"
                   alt=""
                   aria-hidden="true"
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 rotate-12"
+                  width={20}
+                  height={14}
+                  className="absolute -top-3 left-6.5 rotate-25"
                 />
               )}
               <SelectionButton
