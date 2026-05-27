@@ -28,11 +28,11 @@ import {
   useCreateVoteWidgetMutation,
   useSubmitVoteMutation,
 } from '@/features/vote/api/vote.queries';
-import {
-  fetchVoteWidget,
-  type VoteOptionResponse,
-  type VoteParticipationResponse,
-} from '@/features/vote/api/vote.api';
+import { fetchVoteWidget } from '@/features/vote/api/vote.api';
+import type {
+  VoteOptionResponse,
+  VoteParticipationResponse,
+} from '@/features/vote/api/vote.types';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
 import AddWidgetModal from '@/features/dashboard/modal/add-widget-modal/AddWidgetModal';

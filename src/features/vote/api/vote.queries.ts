@@ -5,10 +5,12 @@ import {
   fetchVoteWidget,
   submitVote,
   updateVoteStatus,
-  type CreateVoteWidgetRequest,
-  type SubmitVoteRequest,
-  type UpdateVoteStatusRequest,
 } from './vote.api';
+import type {
+  CreateVoteWidgetRequest,
+  SubmitVoteRequest,
+  UpdateVoteStatusRequest,
+} from './vote.types';
 
 export function useCreateVoteWidgetMutation(token: string) {
   const queryClient = useQueryClient();
