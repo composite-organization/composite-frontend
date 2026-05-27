@@ -27,11 +27,13 @@ import { fetchMemoWidget } from '@/features/memo/api/memo.api';
 import {
   useCreateVoteWidgetMutation,
   useSubmitVoteMutation,
+  useUpdateVoteStatusMutation,
 } from '@/features/vote/api/vote.queries';
 import { fetchVoteWidget } from '@/features/vote/api/vote.api';
 import type {
   VoteOptionResponse,
   VoteParticipationResponse,
+  VoteStatus,
 } from '@/features/vote/api/vote.types';
 import SiteHeader from '@/shared/components/widget/dashboard-header/DashboardHeader';
 import DashboardHeader from '@/features/dashboard/ui/dashboard-header/DashboardHeader';
@@ -67,6 +69,8 @@ type VoteWidget = {
   description: string;
   selections: VoteSelectionItem[];
   options: string[];
+  status: VoteStatus;
+  endedSelectedOptionIds?: number[];
 };
 
 type NoteWidget = {
@@ -187,6 +191,7 @@ function DashBoardPage() {
   const createMemoMutation = useCreateMemoWidgetMutation(authToken);
   const createVoteMutation = useCreateVoteWidgetMutation(authToken);
   const submitVoteMutation = useSubmitVoteMutation(authToken);
+  const updateVoteStatusMutation = useUpdateVoteStatusMutation(authToken);
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -227,6 +232,8 @@ function DashBoardPage() {
               data.isAnonymous,
               data.isMultiSelectable,
             ),
+            status: data.status,
+            endedSelectedOptionIds: data.endedResponse?.selectedOptionIds,
           }),
         );
         setWidgets([...memoWidgets, ...voteWidgets]);
@@ -352,6 +359,7 @@ function DashBoardPage() {
                 createdVote.isAnonymous,
                 createdVote.isMultiSelectable,
               ),
+              status: createdVote.status,
             },
           ]);
           setActiveCreateModal(null);
@@ -388,6 +396,40 @@ function DashBoardPage() {
             );
           } catch (error) {
             console.error('투표 결과 갱신 실패', error);
+          }
+        },
+      },
+    );
+  }
+
+  function handleVoteEndSubmit(voteWidgetId: number) {
+    updateVoteStatusMutation.mutate(
+      {
+        voteWidgetId,
+        body: { status: 'ENDED' },
+      },
+      {
+        onSuccess: async () => {
+          try {
+            const updatedVote = await fetchVoteWidget(voteWidgetId, authToken);
+            setWidgets((previous) =>
+              previous.map((widget) =>
+                widget.type === 'vote' && widget.voteWidgetId === voteWidgetId
+                  ? {
+                      ...widget,
+                      status: updatedVote.status,
+                      selections: buildVoteSelections(
+                        updatedVote.options,
+                        updatedVote.participationResponse,
+                      ),
+                      endedSelectedOptionIds:
+                        updatedVote.endedResponse?.selectedOptionIds,
+                    }
+                  : widget,
+              ),
+            );
+          } catch (error) {
+            console.error('투표 종료 후 갱신 실패', error);
           }
         },
       },
@@ -444,6 +486,13 @@ function DashBoardPage() {
             description={widget.description}
             selections={widget.selections}
             options={widget.options}
+            isEnded={widget.status === 'ENDED'}
+            selectedOptionIds={widget.endedSelectedOptionIds}
+            onStopClick={() => {
+              if (widget.voteWidgetId !== undefined) {
+                handleVoteEndSubmit(widget.voteWidgetId);
+              }
+            }}
           />
         ) : (
           <VoteStudent
@@ -452,6 +501,8 @@ function DashBoardPage() {
             selections={widget.selections}
             options={widget.options}
             isMultipleChoice={widget.options.includes('복수선택')}
+            isEnded={widget.status === 'ENDED'}
+            selectedOptionIds={widget.endedSelectedOptionIds}
             onSubmit={(selectedIds) => {
               if (widget.voteWidgetId !== undefined) {
                 handleVoteStudentSubmit(widget.voteWidgetId, selectedIds);

@@ -8,6 +8,8 @@ interface VoteTeacherProps {
   description: string;
   options: string[];
   selections: VoteSelectionItem[];
+  isEnded?: boolean;
+  selectedOptionIds?: number[];
   onStatusClick?: () => void;
   onStopClick?: () => void;
 }
@@ -17,6 +19,8 @@ function VoteTeacher({
   description,
   options,
   selections,
+  isEnded = false,
+  selectedOptionIds,
   onStatusClick,
   onStopClick,
 }: VoteTeacherProps) {
@@ -27,11 +31,17 @@ function VoteTeacher({
           <p className="flex-1 body-regular text-black-500">{description}</p>
           <OptionBadge options={options} />
         </div>
-        <SelectionList variant="teacher" selections={selections} />
+        <SelectionList
+          variant="teacher"
+          selections={selections}
+          selectedOptionIds={selectedOptionIds}
+        />
         <Footer
           onStatusClick={onStatusClick}
           onSubmitClick={onStopClick}
           submitLabel="종료하기"
+          statusLabel={isEnded ? '결과' : '현황'}
+          isSubmitDisabled={isEnded}
         />
       </div>
     </TeacherWidgetContainer>

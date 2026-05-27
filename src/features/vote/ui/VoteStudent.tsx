@@ -10,6 +10,8 @@ interface VoteStudentProps {
   options: string[];
   selections: VoteSelectionItem[];
   isMultipleChoice: boolean;
+  isEnded?: boolean;
+  selectedOptionIds?: number[];
   onSubmit: (selectedIds: string[]) => void;
   onStatusClick?: () => void;
 }
@@ -20,6 +22,8 @@ function VoteStudent({
   options,
   selections,
   isMultipleChoice,
+  isEnded = false,
+  selectedOptionIds,
   onSubmit,
   onStatusClick,
 }: VoteStudentProps) {
@@ -53,12 +57,14 @@ function VoteStudent({
           selections={selections}
           selectedIds={selectedIds}
           onSelect={handleSelect}
+          isEnded={isEnded}
+          selectedOptionIds={selectedOptionIds}
         />
         <Footer
           onStatusClick={onStatusClick}
           onSubmitClick={handleSubmit}
           submitLabel="제출하기"
-          isSubmitDisabled={selectedIds.length === 0}
+          isSubmitDisabled={isEnded || selectedIds.length === 0}
         />
       </div>
     </StudentWidgetContainer>
