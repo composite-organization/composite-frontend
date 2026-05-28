@@ -8,32 +8,26 @@ import {
   type AuthenticateLessonRequest,
 } from './lesson.api';
 
-export function useLessonQuery(lessonId: number, token: string) {
+export function useLessonQuery(lessonId: number) {
   return useQuery({
-    queryKey: ['lesson', 'detail', lessonId, token],
-    queryFn: () => fetchLesson(lessonId, token),
-    enabled: !!lessonId && !!token,
+    queryKey: ['lesson', 'detail', lessonId],
+    queryFn: () => fetchLesson(lessonId),
+    enabled: !!lessonId,
   });
 }
 
-export function useLessonWidgetIdsQuery(lessonId: number, token: string) {
+export function useLessonWidgetIdsQuery(lessonId: number) {
   return useQuery({
     queryKey: ['lesson', 'widgets', lessonId],
-    queryFn: () => fetchLessonWidgetIds(lessonId, token),
-    enabled: !!lessonId && !!token,
+    queryFn: () => fetchLessonWidgetIds(lessonId),
+    enabled: !!lessonId,
   });
 }
 
 export function useCreateLessonMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      body,
-      guestToken,
-    }: {
-      body: CreateLessonRequest;
-      guestToken: string;
-    }) => createLesson(body, guestToken),
+    mutationFn: (body: CreateLessonRequest) => createLesson(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lesson'] });
     },
