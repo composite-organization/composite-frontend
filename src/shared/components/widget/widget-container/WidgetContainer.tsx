@@ -44,6 +44,7 @@ function WidgetContainerBase({
   onDeleteClick,
 }: WidgetContainerBaseProps) {
   const [isActionMenuOpen, setIsActionMenuOpen] = useState(false);
+  const hasActionMenu = showMore && (!!onEditClick || !!onDeleteClick);
 
   function handleMoreClick() {
     setIsActionMenuOpen((previous) => !previous);
@@ -69,7 +70,7 @@ function WidgetContainerBase({
             <span className="label-regular text-black-200">{description}</span>
           </div>
         </div>
-        {showMore && (
+        {hasActionMenu && (
           <div className="relative">
             <IconButton
               iconName="more"
@@ -79,8 +80,8 @@ function WidgetContainerBase({
             />
             {isActionMenuOpen && (
               <MoreActionMenu
-                onEditClick={handleEditClick}
-                onDeleteClick={handleDeleteClick}
+                onEditClick={onEditClick ? handleEditClick : undefined}
+                onDeleteClick={onDeleteClick ? handleDeleteClick : undefined}
               />
             )}
           </div>

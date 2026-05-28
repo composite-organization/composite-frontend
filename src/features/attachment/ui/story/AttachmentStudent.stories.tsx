@@ -1,34 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { LectureMaterial } from '../../types';
-import LectureMaterialsTeacher from '../LectureMaterialsTeacher';
+import type { AttachmentWidget } from '../../types';
+import AttachmentWidgetStudent from '../AttachmentStudent';
 
-const meta: Meta<typeof LectureMaterialsTeacher> = {
-  title: 'Feature/LectureMaterialsTeacher',
-  component: LectureMaterialsTeacher,
+const meta: Meta<typeof AttachmentWidgetStudent> = {
+  title: 'Feature/AttachmentWidgetStudent',
+  component: AttachmentWidgetStudent,
   argTypes: {
-    materials: {
+    attachments: {
       description: '표시할 강의 자료 목록',
       control: false,
-    },
-    onUpload: {
-      description: '파일 업로드 시 호출되는 핸들러',
-      action: 'onUpload',
     },
     onDownload: {
       description: '자료 다운로드 버튼 클릭 시 호출되는 핸들러',
       action: 'onDownload',
     },
-    onDelete: {
-      description: '자료 삭제 버튼 클릭 시 호출되는 핸들러',
-      action: 'onDelete',
-    },
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof LectureMaterialsTeacher>;
+type Story = StoryObj<typeof AttachmentWidgetStudent>;
 
-const sampleMaterials: LectureMaterial[] = [
+const sampleAttachments: AttachmentWidget[] = [
   {
     id: '1',
     name: '1주차 강의 슬라이드.pdf',
@@ -54,18 +46,14 @@ const sampleMaterials: LectureMaterial[] = [
 
 export const Default: Story = {
   args: {
-    materials: sampleMaterials,
-    onUpload: () => {},
+    attachments: sampleAttachments,
     onDownload: () => {},
-    onDelete: () => {},
   },
 };
 
 export const Empty: Story = {
   args: {
-    materials: [],
-    onUpload: () => {},
+    attachments: [],
     onDownload: () => {},
-    onDelete: () => {},
   },
 };

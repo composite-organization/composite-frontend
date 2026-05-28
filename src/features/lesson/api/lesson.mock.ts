@@ -6,6 +6,28 @@ function checkAuthorization(request: Request): boolean {
 }
 
 export const lessonHandlers = [
+  http.get('/lessons/:lessonId/widgets', ({ request }) => {
+    if (!checkAuthorization(request)) {
+      return HttpResponse.json(
+        {
+          code: 'USER_UI_001',
+          message: '인증 정보가 필요한 요청입니다.',
+          detail: null,
+        },
+        { status: 401 },
+      );
+    }
+
+    return HttpResponse.json({
+      widgets: {
+        memo: [],
+        quiz: [],
+        vote: [],
+        attachment: [1],
+      },
+    });
+  }),
+
   http.get('/lessons/:lessonCode', ({ params, request }) => {
     if (!checkAuthorization(request)) {
       return HttpResponse.json(

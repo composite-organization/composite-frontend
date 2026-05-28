@@ -41,18 +41,22 @@ function MoreActionMenu({
       )}
       role="menu"
     >
-      <ActionItem
-        variant="edit"
-        iconName="edit"
-        label="수정"
-        onClick={onEditClick}
-      />
-      <ActionItem
-        variant="delete"
-        iconName="delete"
-        label="삭제"
-        onClick={onDeleteClick}
-      />
+      {onEditClick && (
+        <ActionItem
+          variant="edit"
+          iconName="edit"
+          label="수정"
+          onClick={onEditClick}
+        />
+      )}
+      {onDeleteClick && (
+        <ActionItem
+          variant="delete"
+          iconName="delete"
+          label="삭제"
+          onClick={onDeleteClick}
+        />
+      )}
     </div>
   );
 }
