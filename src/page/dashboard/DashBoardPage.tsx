@@ -122,23 +122,19 @@ function SortableWidget({ widget, children }: SortableWidgetProps) {
 
 interface AttachmentWidgetCardProps {
   attachmentWidgetId: number;
-  token: string;
   onDeleteWidget: () => void;
 }
 
 function AttachmentWidgetCard({
   attachmentWidgetId,
-  token,
   onDeleteWidget,
 }: AttachmentWidgetCardProps) {
-  const { data: attachmentData = [] } = useAttachmentWidgetAttachmentsQuery(
-    attachmentWidgetId,
-    token,
-  );
+  const { data: attachmentData = [] } =
+    useAttachmentWidgetAttachmentsQuery(attachmentWidgetId);
   const uploadAttachmentMutation =
-    useUploadAttachmentWidgetAttachmentMutation(token);
+    useUploadAttachmentWidgetAttachmentMutation();
   const deleteAttachmentMutation =
-    useDeleteAttachmentWidgetAttachmentMutation(token);
+    useDeleteAttachmentWidgetAttachmentMutation();
 
   const attachments: AttachmentWidget[] = attachmentData.map((attachment) => ({
     id: String(attachment.id),
@@ -169,11 +165,9 @@ function AttachmentWidgetCard({
     const { url } = await fetchAttachmentWidgetAttachmentDetail(
       attachmentWidgetId,
       Number(attachment.id),
-      token,
     );
     const fileName = await fetchAttachmentWidgetAttachments(
       attachmentWidgetId,
-      token,
     ).then((attachmentList) => {
       const targetAttachment = attachmentList.find(
         (att) => String(att.id) === attachment.id,
@@ -233,7 +227,6 @@ function DashBoardPage() {
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const hasInitializedRef = useRef(false);
 
-  const authToken = localStorage.getItem('authToken') ?? '';
   const { data: widgetIdsData } = useLessonWidgetIdsQuery(lessonId);
   const memoWidgetIds = useMemo(
     () => widgetIdsData?.widgets.memo ?? [],
@@ -244,15 +237,12 @@ function DashBoardPage() {
     [widgetIdsData],
   );
   const createMemoMutation = useCreateMemoWidgetMutation();
-  const createAttachmentWidgetMutation =
-    useCreateAttachmentWidgetMutation(authToken);
-  const deleteAttachmentWidgetMutation =
-    useDeleteAttachmentWidgetMutation(authToken);
+  const createAttachmentWidgetMutation = useCreateAttachmentWidgetMutation();
+  const deleteAttachmentWidgetMutation = useDeleteAttachmentWidgetMutation();
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
     if (!widgetIdsData) return;
-    if (!authToken) return;
 
     const loadDashboardWidgets = async () => {
       try {
@@ -280,7 +270,7 @@ function DashBoardPage() {
     };
 
     loadDashboardWidgets();
-  }, [memoWidgetIds, attachmentWidgetIds, widgetIdsData, authToken]);
+  }, [memoWidgetIds, attachmentWidgetIds, widgetIdsData]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -467,7 +457,6 @@ function DashBoardPage() {
         return (
           <AttachmentWidgetCard
             attachmentWidgetId={widget.attachmentWidgetId}
-            token={authToken}
             onDeleteWidget={() => handleDeleteAttachmentWidget(widget)}
           />
         );

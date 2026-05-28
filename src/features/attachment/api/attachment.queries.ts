@@ -11,11 +11,11 @@ import {
   type UploadAttachmentWidgetAttachmentRequest,
 } from './attachment.api';
 
-export function useCreateAttachmentWidgetMutation(token: string) {
+export function useCreateAttachmentWidgetMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: CreateAttachmentWidgetRequest) =>
-      createAttachmentWidget(body, token),
+      createAttachmentWidget(body),
     onSuccess: ({ lessonId }) => {
       queryClient.invalidateQueries({
         queryKey: ['lesson', 'widgets', lessonId],
@@ -24,22 +24,19 @@ export function useCreateAttachmentWidgetMutation(token: string) {
   });
 }
 
-export function useAttachmentWidgetQuery(
-  attachmentWidgetId: number,
-  token: string,
-) {
+export function useAttachmentWidgetQuery(attachmentWidgetId: number) {
   return useQuery({
     queryKey: ['attachmentWidgets', attachmentWidgetId],
-    queryFn: () => fetchAttachmentWidget(attachmentWidgetId, token),
-    enabled: !!attachmentWidgetId && !!token,
+    queryFn: () => fetchAttachmentWidget(attachmentWidgetId),
+    enabled: !!attachmentWidgetId,
   });
 }
 
-export function useDeleteAttachmentWidgetMutation(token: string) {
+export function useDeleteAttachmentWidgetMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (attachmentWidgetId: number) =>
-      deleteAttachmentWidget(attachmentWidgetId, token),
+      deleteAttachmentWidget(attachmentWidgetId),
     onSuccess: (_data, attachmentWidgetId) => {
       queryClient.invalidateQueries({
         queryKey: ['attachmentWidgets', attachmentWidgetId],
@@ -51,16 +48,15 @@ export function useDeleteAttachmentWidgetMutation(token: string) {
 
 export function useAttachmentWidgetAttachmentsQuery(
   attachmentWidgetId: number,
-  token: string,
 ) {
   return useQuery({
     queryKey: ['attachmentWidgets', attachmentWidgetId, 'attachments'],
-    queryFn: () => fetchAttachmentWidgetAttachments(attachmentWidgetId, token),
-    enabled: !!attachmentWidgetId && !!token,
+    queryFn: () => fetchAttachmentWidgetAttachments(attachmentWidgetId),
+    enabled: !!attachmentWidgetId,
   });
 }
 
-export function useUploadAttachmentWidgetAttachmentMutation(token: string) {
+export function useUploadAttachmentWidgetAttachmentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -69,7 +65,7 @@ export function useUploadAttachmentWidgetAttachmentMutation(token: string) {
     }: {
       attachmentWidgetId: number;
       body: UploadAttachmentWidgetAttachmentRequest;
-    }) => uploadAttachmentWidgetAttachment(attachmentWidgetId, body, token),
+    }) => uploadAttachmentWidgetAttachment(attachmentWidgetId, body),
     onSuccess: (_data, { attachmentWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['attachmentWidgets', attachmentWidgetId, 'attachments'],
@@ -81,7 +77,6 @@ export function useUploadAttachmentWidgetAttachmentMutation(token: string) {
 export function useAttachmentWidgetAttachmentDetailQuery(
   attachmentWidgetId: number,
   attachmentId: number,
-  token: string,
 ) {
   return useQuery({
     queryKey: [
@@ -91,16 +86,12 @@ export function useAttachmentWidgetAttachmentDetailQuery(
       attachmentId,
     ],
     queryFn: () =>
-      fetchAttachmentWidgetAttachmentDetail(
-        attachmentWidgetId,
-        attachmentId,
-        token,
-      ),
-    enabled: !!attachmentWidgetId && !!attachmentId && !!token,
+      fetchAttachmentWidgetAttachmentDetail(attachmentWidgetId, attachmentId),
+    enabled: !!attachmentWidgetId && !!attachmentId,
   });
 }
 
-export function useDeleteAttachmentWidgetAttachmentMutation(token: string) {
+export function useDeleteAttachmentWidgetAttachmentMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -109,8 +100,7 @@ export function useDeleteAttachmentWidgetAttachmentMutation(token: string) {
     }: {
       attachmentWidgetId: number;
       attachmentId: number;
-    }) =>
-      deleteAttachmentWidgetAttachment(attachmentWidgetId, attachmentId, token),
+    }) => deleteAttachmentWidgetAttachment(attachmentWidgetId, attachmentId),
     onSuccess: (_data, { attachmentWidgetId }) => {
       queryClient.invalidateQueries({
         queryKey: ['attachmentWidgets', attachmentWidgetId, 'attachments'],
