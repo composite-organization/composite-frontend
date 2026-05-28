@@ -25,8 +25,6 @@ http.interceptors.request.use((config) => {
 
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
-  } else {
-    headers.delete('Authorization');
   }
 
   return {
