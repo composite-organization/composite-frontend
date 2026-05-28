@@ -38,42 +38,24 @@ export interface AuthenticateLessonResponse {
 
 export async function createLesson(
   body: CreateLessonRequest,
-  guestToken: string,
 ): Promise<CreateLessonResponse> {
-  const response = await http.post<CreateLessonResponse>('/lessons', body, {
-    headers: {
-      Authorization: `Bearer ${guestToken}`,
-    },
-  });
+  const response = await http.post<CreateLessonResponse>('/lessons', body);
   return response.data;
 }
 
 export async function joinLessonAsStudent(
   lessonCode: string,
   body: JoinStudentRequest,
-  token: string,
 ): Promise<JoinStudentResponse> {
   const response = await http.post<JoinStudentResponse>(
     `/lessons/${lessonCode}/students`,
     body,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
   );
   return response.data;
 }
 
-export async function fetchLesson(
-  lessonId: number,
-  token: string,
-): Promise<Lesson> {
-  const response = await http.get<Lesson>(`/lessons/${lessonId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function fetchLesson(lessonId: number): Promise<Lesson> {
+  const response = await http.get<Lesson>(`/lessons/${lessonId}`);
   return response.data;
 }
 
@@ -90,15 +72,9 @@ export interface GetLessonWidgetIdsResponse {
 
 export async function fetchLessonWidgetIds(
   lessonId: number,
-  token: string,
 ): Promise<GetLessonWidgetIdsResponse> {
   const response = await http.get<GetLessonWidgetIdsResponse>(
     `/lessons/${lessonId}/widgets`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
   );
   return response.data;
 }
