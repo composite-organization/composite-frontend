@@ -146,15 +146,16 @@ function AttachmentWidgetCard({
     size: attachment.size,
   }));
 
-  function handleUpload(files: FileList) {
+  const handleUpload = (files: FileList) => {
     Array.from(files).forEach((file) => {
       uploadAttachmentMutation.mutate({
         attachmentWidgetId,
         body: { attachment: file },
       });
     });
-  }
-  function downloadFile(url: string, fileName: string) {
+  };
+
+  const downloadFile = (url: string, fileName: string) => {
     const link = document.createElement('a');
     link.href = url;
     link.download = fileName;
@@ -162,8 +163,9 @@ function AttachmentWidgetCard({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }
-  async function handleDownload(attachment: AttachmentWidget) {
+  };
+
+  const handleDownload = async (attachment: AttachmentWidget) => {
     const { url } = await fetchAttachmentWidgetAttachmentDetail(
       attachmentWidgetId,
       Number(attachment.id),
@@ -190,14 +192,14 @@ function AttachmentWidgetCard({
     } catch {
       downloadFile(url, fileName);
     }
-  }
+  };
 
-  function handleDelete(attachment: AttachmentWidget) {
+  const handleDelete = (attachment: AttachmentWidget) => {
     deleteAttachmentMutation.mutate({
       attachmentWidgetId,
       attachmentId: Number(attachment.id),
     });
-  }
+  };
 
   return (
     <AttachmentWidgetTeacher
@@ -284,15 +286,15 @@ function DashBoardPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
-  function handleOpenAddModal() {
+  const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
-  }
+  };
 
-  function handleCloseAddModal() {
+  const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
-  }
+  };
 
-  function handleSelectWidget(id: WidgetName) {
+  const handleSelectWidget = (id: WidgetName) => {
     setIsAddModalOpen(false);
     if (id === 'quiz' || id === 'vote') {
       setActiveCreateModal(id);
@@ -325,17 +327,17 @@ function DashBoardPage() {
       ...previous,
       { type: id, id: crypto.randomUUID() },
     ]);
-  }
+  };
 
-  function handleCloseCreateModal() {
+  const handleCloseCreateModal = () => {
     setActiveCreateModal(null);
-  }
+  };
 
-  function handleCloseMemoCreateModal() {
+  const handleCloseMemoCreateModal = () => {
     setIsMemoCreateOpen(false);
-  }
+  };
 
-  function handleMemoSubmit(data: MemoCreateData) {
+  const handleMemoSubmit = (data: MemoCreateData) => {
     if (!lessonId) return;
     createMemoMutation.mutate(
       {
@@ -359,9 +361,9 @@ function DashBoardPage() {
         },
       },
     );
-  }
+  };
 
-  function handleQuizSubmit(data: QuizCreateData) {
+  const handleQuizSubmit = (data: QuizCreateData) => {
     setWidgets((previous) => [
       ...previous,
       {
@@ -374,14 +376,14 @@ function DashBoardPage() {
       },
     ]);
     setActiveCreateModal(null);
-  }
+  };
 
-  function handleVoteSubmit(data: {
+  const handleVoteSubmit = (data: {
     title: string;
     description: string;
     selections: VoteSelectionItem[];
     options: { id: string; label: string; enabled: boolean }[];
-  }) {
+  }) => {
     setWidgets((previous) => [
       ...previous,
       {
@@ -396,9 +398,9 @@ function DashBoardPage() {
       },
     ]);
     setActiveCreateModal(null);
-  }
+  };
 
-  function handleQuizEnd(widgetId: string) {
+  const handleQuizEnd = (widgetId: string) => {
     setWidgets((previous) =>
       previous.map((widget) =>
         widget.id === widgetId && widget.type === 'quiz'
@@ -406,9 +408,9 @@ function DashBoardPage() {
           : widget,
       ),
     );
-  }
+  };
 
-  function handleDeleteAttachmentWidget(widget: AttachmentDashboardWidget) {
+  const handleDeleteAttachmentWidget = (widget: AttachmentDashboardWidget) => {
     deleteAttachmentWidgetMutation.mutate(widget.attachmentWidgetId, {
       onSuccess: () => {
         setWidgets((previous) =>
@@ -416,9 +418,9 @@ function DashBoardPage() {
         );
       },
     });
-  }
+  };
 
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -427,9 +429,9 @@ function DashBoardPage() {
       const newIndex = previous.findIndex((widget) => widget.id === over.id);
       return arrayMove(previous, oldIndex, newIndex);
     });
-  }
+  };
 
-  function renderWidget(widget: DashboardWidget) {
+  const renderWidget = (widget: DashboardWidget) => {
     switch (widget.type) {
       case 'quiz':
         return (
@@ -472,7 +474,7 @@ function DashBoardPage() {
       default:
         return null;
     }
-  }
+  };
 
   return (
     <div className="w-full">
